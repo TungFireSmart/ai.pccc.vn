@@ -1372,3 +1372,112 @@ button {
   color: #dffdf9;
   font-size: 13px;
 }
+
+.role-mode-switch {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding: 18px 20px;
+}
+
+.role-mode-switch p,
+.approval-step p,
+.export-card p,
+.role-mode-switch strong,
+.approval-step strong,
+.export-card strong,
+.approval-step small,
+.export-card small,
+.approval-step-head span,
+.mode-pill {
+  color: #edf4ff;
+}
+
+.mode-pill-row,
+.landing-state-grid,
+.approval-rail,
+.export-rail {
+  display: grid;
+  gap: 14px;
+}
+
+.mode-pill-row {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.mode-pill {
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+}
+
+.mode-pill.active {
+  color: #041019;
+  background: linear-gradient(135deg, #7bf5e7, #78a9ff);
+  border-color: transparent;
+  box-shadow: 0 18px 40px rgba(84, 171, 255, 0.24);
+}
+
+.landing-state-grid,
+.approval-rail,
+.export-rail {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.approval-step,
+.export-card {
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.03));
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.28);
+}
+
+.approval-step-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.approval-step-head span {
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: rgba(120, 169, 255, 0.12);
+  border: 1px solid rgba(120, 169, 255, 0.16);
+}
+
+.approval-step.done,
+.export-card.state-approved,
+.export-card.state-ready-to-share {
+  border-color: rgba(123, 245, 231, 0.22);
+}
+
+.approval-step.active,
+.export-card.state-needs-approval {
+  border-color: rgba(255, 206, 96, 0.3);
+  background: linear-gradient(180deg, rgba(255, 206, 96, 0.08), rgba(255, 255, 255, 0.03));
+}
+
+.approval-step.pending,
+.export-card.state-draft {
+  border-color: rgba(255, 141, 141, 0.24);
+}
+
+.approval-step p,
+.export-card p {
+  margin: 8px 0 0;
+  color: #a9bed4;
+  line-height: 1.7;
+}
+
+.approval-step small,
+.export-card small {
+  display: block;
+  margin-top: 8px;
+  color: #8ca4bf;
+}

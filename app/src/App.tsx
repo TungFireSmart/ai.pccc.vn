@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react'
 import './App.css'
-import { heroStats, navItems, stationSignals, threadContextPacks, type Screen } from './data'
+import { heroStats, navItems, stationSignals, threadContextPacks, type Screen, type WorkspaceModeKey } from './data'
 import { AuthScreen, ChatScreen, HomeScreen, StationScreen, TopNav } from './components'
 
 function App() {
   const [screen, setScreen] = useState<Screen>('home')
   const [activeThread, setActiveThread] = useState(threadContextPacks[0].threadTitle)
   const [activeAuth, setActiveAuth] = useState(threadContextPacks[0].authStageKey)
+  const [activeMode, setActiveMode] = useState<WorkspaceModeKey>('owner')
   const activeContext = useMemo(() => threadContextPacks.find((item) => item.threadTitle === activeThread) ?? threadContextPacks[0], [activeThread])
 
   return (
@@ -25,20 +26,20 @@ function App() {
       <main className="main-shell">
         <section className="review-ribbon glass-panel">
           <div>
-            <strong>Next checkpoint · internal-pilot pass</strong>
-            <p>Thêm execution layer, pilot framing và workflow coherence để app bớt tĩnh và giống sản phẩm có thể đưa vào dùng nội bộ sớm.</p>
+            <strong>Next checkpoint · internal-test readiness</strong>
+            <p>Role-aware landing, approval chain và export rail đã được đưa vào cùng thread/workspace context để prototype bớt tĩnh và gần sản phẩm dùng nội bộ hơn.</p>
           </div>
           <div className="mini-tags right">
-            <span>Workflow realism</span>
-            <span>Pilot-ready use cases</span>
-            <span>Trust + station</span>
+            <span>Role-based workspace</span>
+            <span>Approval + export realism</span>
+            <span>Pilot-ready flows</span>
           </div>
         </section>
 
-        {screen === 'home' && <HomeScreen heroStats={heroStats} setScreen={setScreen} />}
-        {screen === 'auth' && <AuthScreen activeContext={activeContext} activeAuth={activeAuth} setActiveAuth={setActiveAuth} />}
-        {screen === 'chat' && <ChatScreen activeThread={activeThread} setActiveThread={setActiveThread} activeContext={activeContext} setActiveAuth={setActiveAuth} />}
-        {screen === 'station' && <StationScreen signals={stationSignals} activeContext={activeContext} setActiveThread={setActiveThread} setScreen={setScreen} setActiveAuth={setActiveAuth} />}
+        {screen === 'home' && <HomeScreen heroStats={heroStats} setScreen={setScreen} activeMode={activeMode} setActiveMode={setActiveMode} activeContext={activeContext} />}
+        {screen === 'auth' && <AuthScreen activeContext={activeContext} activeAuth={activeAuth} setActiveAuth={setActiveAuth} activeMode={activeMode} />}
+        {screen === 'chat' && <ChatScreen activeThread={activeThread} setActiveThread={setActiveThread} activeContext={activeContext} setActiveAuth={setActiveAuth} activeMode={activeMode} />}
+        {screen === 'station' && <StationScreen signals={stationSignals} activeContext={activeContext} setActiveThread={setActiveThread} setScreen={setScreen} setActiveAuth={setActiveAuth} activeMode={activeMode} />}
       </main>
     </div>
   )

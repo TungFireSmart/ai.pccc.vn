@@ -1,4 +1,6 @@
 export type Screen = 'home' | 'auth' | 'chat' | 'station'
+export type WorkspaceModeKey = 'owner' | 'sales' | 'technical' | 'bid' | 'knowledge'
+export type ExportState = 'Draft' | 'Needs approval' | 'Approved' | 'Ready to share'
 
 export type NavItem = { key: Screen; label: string }
 export type Feature = { title: string; description: string }
@@ -40,7 +42,17 @@ export type HandoffStep = { label: string; detail: string; done: boolean }
 export type AuthSession = { device: string; location: string; status: string; lastSeen: string }
 export type AccessRow = { role: string; scope: string; approval: string; seat: string }
 export type PolicyItem = { label: string; detail: string; status: string }
-
+export type ApprovalStep = { label: string; owner: string; status: 'Done' | 'Active' | 'Pending'; note: string }
+export type ExportArtifact = { name: string; channel: string; state: ExportState; eta: string; note: string }
+export type WorkspaceMode = {
+  key: WorkspaceModeKey
+  label: string
+  landing: string
+  workspaceState: string
+  primaryGoal: string
+  canApprove: string
+  focus: string[]
+}
 
 export type ThreadContextPack = {
   threadTitle: string
@@ -50,12 +62,16 @@ export type ThreadContextPack = {
   authStageKey: string
   authWorkspaceHint: string
   authTrustNote: string
+  roleLandingLabel: string
+  roleWorkspaceState: string
   metrics: MiniMetric[]
   files: FileItem[]
   outputs: string[]
   pulse: InboxItem[]
   activities: ActivityItem[]
   handoffSteps: HandoffStep[]
+  approvalSteps: ApprovalStep[]
+  exportArtifacts: ExportArtifact[]
   messages: Message[]
   stationBoard: WorkspaceBoard
   stationFocus: {
@@ -66,6 +82,54 @@ export type ThreadContextPack = {
     reviewLabel: string
   }
 }
+
+export const workspaceModes: WorkspaceMode[] = [
+  {
+    key: 'owner',
+    label: 'Owner mode',
+    landing: 'Owner cockpit',
+    workspaceState: 'Theo dõi deadline, quyền và approval trên toàn workspace',
+    primaryGoal: 'Gỡ bottleneck và duyệt các output có ảnh hưởng ra ngoài.',
+    canApprove: 'Export risk, role elevation, publish library',
+    focus: ['Approval queue', 'Cross-desk health', 'External-safe outputs'],
+  },
+  {
+    key: 'sales',
+    label: 'Sales mode',
+    landing: 'Sales follow-up board',
+    workspaceState: 'Tập trung SLA phản hồi, thiếu dữ liệu khách và draft gửi ra ngoài',
+    primaryGoal: 'Giữ lead nóng nhưng không tạo lead/báo giá sai dữ liệu.',
+    canApprove: 'Sales-safe customer drafts trong phạm vi desk',
+    focus: ['Reply SLA', 'Customer-safe draft', 'Lead data gate'],
+  },
+  {
+    key: 'technical',
+    label: 'Technical mode',
+    landing: 'Technical verification queue',
+    workspaceState: 'Ưu tiên scope, model, tiêu chuẩn và sign-off trước khi gửi',
+    primaryGoal: 'Xác nhận phần kỹ thuật trước khi thread đi tiếp sang export.',
+    canApprove: 'Technical sign-off cho note và checklist',
+    focus: ['Model verification', 'Standards check', 'Risk flags'],
+  },
+  {
+    key: 'bid',
+    label: 'Bid mode',
+    landing: 'Bid deadline board',
+    workspaceState: 'Giữ nhịp checklist, hồ sơ thiếu và phối hợp liên phòng',
+    primaryGoal: 'Chốt bộ nộp thầu đúng deadline, không rơi bước bàn giao.',
+    canApprove: 'Internal handoff package trước export',
+    focus: ['Deadline risk', 'Artifact completeness', 'Owner escalation'],
+  },
+  {
+    key: 'knowledge',
+    label: 'Knowledge mode',
+    landing: 'Knowledge publish queue',
+    workspaceState: 'Giữ nguồn, peer review và library hygiene trước khi publish',
+    primaryGoal: 'Biến note thành tài sản dùng chung mà không sai viện dẫn.',
+    canApprove: 'Library-ready summary sau peer review',
+    focus: ['Source hygiene', 'Peer review', 'Reusable output'],
+  },
+]
 
 export const navItems: NavItem[] = [
   { key: 'home', label: 'Trang chủ' },
@@ -247,69 +311,6 @@ export const suggestedPrompts = [
   'Tạo bảng câu hỏi kỹ thuật để sale khai thác đủ đầu vào trước báo giá',
 ]
 
-export const chatMessages: Message[] = [
-  {
-    role: 'assistant',
-    meta: 'AI PCCC Copilot · Bid Desk mode · Context locked to project Nhà xưởng Bình Dương',
-    content: 'Em đã nhận 4 file của gói thầu nhà xưởng Bình Dương. Em đang bóc nhanh theo 6 nhóm: phạm vi hệ thống, tiêu chuẩn áp dụng, thiết bị bắt buộc, hồ sơ năng lực, điều kiện thương mại và các điểm cần kỹ thuật xác nhận.',
-  },
-  {
-    role: 'user',
-    meta: 'Project: Nhà xưởng Bình Dương · Deadline 17:00',
-    content: 'Ưu tiên cho tôi checklist rà nhanh HSMT và đánh dấu các mục dễ thiếu trước deadline 17h hôm nay. Nếu được thì soạn luôn draft email phân việc cho đội hồ sơ.',
-  },
-  {
-    role: 'assistant',
-    meta: 'Working draft · 18 mục · 3 risk flags · output queue synced',
-    content: 'Em đã tạo checklist 18 mục, trong đó có 3 điểm đỏ: năng lực nhân sự, xác nhận xuất xứ thiết bị và biểu mẫu tiến độ. Em cũng đề xuất email phân việc chia cho kỹ thuật, hồ sơ và sale để chốt các phần còn thiếu trong vòng 90 phút.',
-  },
-  {
-    role: 'assistant',
-    meta: 'Next actions · export + handoff available',
-    content: 'Bước tiếp theo em có thể xuất ngay 3 output song song: checklist nộp thầu, email phân việc và note hỏi kỹ thuật. Em sẽ giữ chung context để không bị lệch giữa các bản nháp, đồng thời gắn owner cho từng output để team theo dõi dễ hơn.',
-  },
-]
-
-export const chatSideOutputs = [
-  'Checklist rà HSMT — 18 mục · draft v2',
-  'Email nội bộ phân việc — ready to send',
-  'Danh sách 3 rủi ro dễ thiếu — flagged',
-  'Note căn cứ áp dụng — 1 trang · needs review',
-]
-
-export const workspacePulse: InboxItem[] = [
-  { label: 'Project context', note: 'Nhà xưởng Bình Dương · deadline 17:00 · phối hợp sale + hồ sơ + kỹ thuật' },
-  { label: 'Knowledge attached', note: 'QC06, TCVN liên quan, checklist nội bộ, email template', tone: 'good' },
-  { label: 'Need review', note: 'Chờ kỹ thuật xác nhận 3 hạng mục trước khi chốt final package' },
-]
-
-export const chatMetrics: MiniMetric[] = [
-  { label: 'Open threads', value: '12', note: '4 thread có deadline trong hôm nay' },
-  { label: 'Avg first reply', value: '08m', note: 'Cho lead và yêu cầu kỹ thuật mới' },
-  { label: 'Artifacts this thread', value: '04', note: 'Checklist · email · note kỹ thuật · legal summary' },
-]
-
-export const activeThreadFiles: FileItem[] = [
-  { name: 'HSMT_Nha_Xuong_Binh_Duong.pdf', kind: 'PDF · 132 trang', status: 'Primary brief' },
-  { name: 'Bang_tien_do_du_thau.xlsx', kind: 'XLSX · 6 sheet', status: 'Missing form review' },
-  { name: 'Checklist_noi_bo_biddesk.docx', kind: 'DOCX · SOP', status: 'Reference attached' },
-  { name: 'Mail_mau_phan_viec.msg', kind: 'Template', status: 'Ready for export' },
-]
-
-export const threadActivities: ActivityItem[] = [
-  { time: '10:12', title: 'Bid Desk khóa context dự án', detail: 'Thread đang dùng chung 4 file và checklist nội bộ của phòng hồ sơ.', tone: 'good' },
-  { time: '10:18', title: 'AI tạo risk flags đầu tiên', detail: 'Đánh dấu thiếu biểu mẫu tiến độ, nhân sự chủ chốt và xuất xứ thiết bị.' },
-  { time: '10:24', title: 'Technical review được yêu cầu', detail: 'Handoff sang Technical Desk để xác nhận 3 hạng mục thiết bị.', tone: 'warning' },
-  { time: '10:31', title: 'Owner visibility bật', detail: 'Thread được đẩy vào vùng theo dõi ưu tiên vì deadline còn dưới 7 giờ.' },
-]
-
-export const threadHandoffSteps: HandoffStep[] = [
-  { label: 'Checklist nội bộ đã tạo', detail: '18 mục với 3 flag đỏ và deadline 17:00.', done: true },
-  { label: 'Email phân việc đã sẵn sàng', detail: 'Có bản nháp cho sale, kỹ thuật và hồ sơ.', done: true },
-  { label: 'Technical sign-off', detail: 'Còn xác nhận model thiết bị và biểu mẫu tiến độ.', done: false },
-  { label: 'Owner review trước khi export', detail: 'Đề nghị duyệt nhanh các mục risk trước khi gửi final.', done: false },
-]
-
 export const authTrustItems: AuthTrustItem[] = [
   { label: 'Workspace match', detail: 'Email admin@pccc.vn khớp workspace AI Station PCCC Vietnam', tone: 'good' },
   { label: 'Trusted device', detail: 'Chrome on MacBook của anh đã từng đăng nhập 18 lần trong 30 ngày qua', tone: 'good' },
@@ -423,7 +424,6 @@ export const policyItems: PolicyItem[] = [
   { label: 'High-risk export review', detail: 'Artifact có gắn cờ đỏ phải qua owner hoặc desk lead trước khi gửi ra ngoài.', status: 'Needs owner review' },
 ]
 
-
 export const threadContextPacks: ThreadContextPack[] = [
   {
     threadTitle: 'Rà HSMT nhà xưởng 5 tầng',
@@ -433,6 +433,8 @@ export const threadContextPacks: ThreadContextPack[] = [
     authStageKey: 'login',
     authWorkspaceHint: 'Owner quay lại đúng workspace chính để tiếp tục chuỗi duyệt HSMT, queue và artifact đang mở.',
     authTrustNote: 'Thiết bị tin cậy có thể vào thẳng workspace nhưng vẫn thấy cảnh báo còn 1 export rủi ro cần owner duyệt.',
+    roleLandingLabel: 'Bid deadline board',
+    roleWorkspaceState: 'Checklist, risk flags và owner approval đang neo toàn bộ workspace quanh deadline 17:00.',
     metrics: [
       { label: 'Open threads', value: '12', note: '4 thread có deadline trong hôm nay' },
       { label: 'Artifacts this thread', value: '04', note: 'Checklist · email · note kỹ thuật · legal summary' },
@@ -467,6 +469,16 @@ export const threadContextPacks: ThreadContextPack[] = [
       { label: 'Technical sign-off', detail: 'Còn xác nhận model thiết bị và biểu mẫu tiến độ.', done: false },
       { label: 'Owner review trước khi export', detail: 'Đề nghị duyệt nhanh các mục risk trước khi gửi final.', done: false },
     ],
+    approvalSteps: [
+      { label: 'AI draft package', owner: 'Bid Desk', status: 'Done', note: 'Checklist + email phân việc đã được ghép cùng project context.' },
+      { label: 'Technical sign-off', owner: 'Technical Desk', status: 'Active', note: 'Còn xác nhận model thiết bị và form tiến độ.' },
+      { label: 'Owner release', owner: 'Tùng', status: 'Pending', note: 'Chỉ mở export ra ngoài sau khi risk flags được duyệt.' },
+    ],
+    exportArtifacts: [
+      { name: 'Checklist nộp thầu PDF', channel: 'Internal package', state: 'Draft', eta: '03m', note: 'Sẵn format nhưng đang chờ sign-off kỹ thuật.' },
+      { name: 'Email phân việc', channel: 'Internal email', state: 'Approved', eta: 'Ready now', note: 'Có thể gửi ngay trong nội bộ để kéo team vào nhịp.' },
+      { name: 'Risk summary', channel: 'Owner review', state: 'Needs approval', eta: '15m', note: 'Giữ ở review rail trước khi chia sẻ rộng hơn.' },
+    ],
     messages: [
       { role: 'assistant', meta: 'AI PCCC Copilot · Bid Desk mode · Context locked to project Nhà xưởng Bình Dương', content: 'Em đã nhận 4 file của gói thầu nhà xưởng Bình Dương. Em đang bóc nhanh theo 6 nhóm: phạm vi hệ thống, tiêu chuẩn áp dụng, thiết bị bắt buộc, hồ sơ năng lực, điều kiện thương mại và các điểm cần kỹ thuật xác nhận.' },
       { role: 'user', meta: 'Project: Nhà xưởng Bình Dương · Deadline 17:00', content: 'Ưu tiên cho tôi checklist rà nhanh HSMT và đánh dấu các mục dễ thiếu trước deadline 17h hôm nay. Nếu được thì soạn luôn draft email phân việc cho đội hồ sơ.' },
@@ -494,6 +506,8 @@ export const threadContextPacks: ThreadContextPack[] = [
     authStageKey: 'invite',
     authWorkspaceHint: 'Flow phù hợp cho Sales Lead vừa được mời vào workspace để xử lý lead mà chưa thấy toàn bộ dữ liệu admin.',
     authTrustNote: 'Invite scope chỉ mở Sales Desk, thread khách hàng và thư viện chung; chưa thấy billing, audit hay hồ sơ nội bộ.',
+    roleLandingLabel: 'Sales follow-up board',
+    roleWorkspaceState: 'Sales được mở đúng lead queue, chỉ thấy desk cần thiết và export rail an toàn cho khách.',
     metrics: [
       { label: 'Reply SLA', value: '30m', note: 'Lead cần phản hồi nhanh trước khi nguội' },
       { label: 'Missing inputs', value: '02', note: 'Tên người nhận báo giá · số điện thoại còn thiếu' },
@@ -524,6 +538,16 @@ export const threadContextPacks: ThreadContextPack[] = [
       { label: 'Xin đủ tên + SĐT', detail: 'Bắt buộc trước khi tạo lead hoặc báo giá.', done: false },
       { label: 'Đối chiếu mã hàng trong FSales', detail: 'Kiểm tra model / nhãn hiệu ngay khi khách xác nhận.', done: false },
     ],
+    approvalSteps: [
+      { label: 'Draft customer reply', owner: 'Sales Desk', status: 'Done', note: 'Tin nhắn đầu tiên đã bám template an toàn cho khách.' },
+      { label: 'Lead data gate', owner: 'Sales Desk', status: 'Active', note: 'Còn thiếu tên + số điện thoại nên chưa mở tạo lead.' },
+      { label: 'Technical handoff trigger', owner: 'Technical Desk', status: 'Pending', note: 'Chỉ bật khi khách trả lời đủ công suất/scope.' },
+    ],
+    exportArtifacts: [
+      { name: 'Zalo reply draft', channel: 'Customer chat', state: 'Ready to share', eta: 'Ready now', note: 'Có thể gửi ngay vì chưa chứa giá nội bộ.' },
+      { name: 'Customer-safe catalog excerpt', channel: 'Attachment', state: 'Approved', eta: 'Ready now', note: 'Đã rút trang phù hợp để gửi cùng phản hồi.' },
+      { name: 'Lead brief', channel: 'Internal handoff', state: 'Draft', eta: 'After customer reply', note: 'Chỉ hình thành khi đủ dữ liệu liên hệ và nhu cầu.' },
+    ],
     messages: [
       { role: 'assistant', meta: 'Sales Desk mode · lead response shell', content: 'Em đã soạn sẵn một phản hồi ngắn để giữ nhịp với khách, đồng thời xin tên và số điện thoại trước khi tạo lead hoặc gửi báo giá.' },
       { role: 'user', meta: 'Lead nóng · khách hỏi nhanh qua Zalo', content: 'Khách đang hỏi tủ bơm chữa cháy cho nhà xưởng nhỏ. Soạn giúp tôi câu trả lời gọn và hỏi thêm thông tin cần thiết.' },
@@ -550,6 +574,8 @@ export const threadContextPacks: ThreadContextPack[] = [
     authStageKey: 'google',
     authWorkspaceHint: 'SSO hợp với chuyên gia nội bộ vào nhanh để tra cứu, rà nguồn và publish note dưới đúng workspace/domain.',
     authTrustNote: 'Domain @pccc.vn khớp nên vào nhanh, nhưng publish ra thư viện chung vẫn giữ bước peer review.',
+    roleLandingLabel: 'Knowledge publish queue',
+    roleWorkspaceState: 'Knowledge mode mở thẳng source pack, peer review và publish rail thay vì generic dashboard.',
     metrics: [
       { label: 'Sources attached', value: '05', note: 'QC06 · TCVN · note nội bộ và 2 trích dẫn liên quan' },
       { label: 'Peer review', value: '01', note: 'Còn 1 lượt kiểm tra chéo trước khi publish' },
@@ -580,6 +606,16 @@ export const threadContextPacks: ThreadContextPack[] = [
       { label: 'Note 1 trang đã tạo', detail: 'Dùng được cho sale và kỹ thuật.', done: true },
       { label: 'Peer review', detail: 'Cần kiểm tra chéo trước khi publish vào workspace library.', done: false },
     ],
+    approvalSteps: [
+      { label: 'Source map completed', owner: 'Knowledge Desk', status: 'Done', note: 'Nguồn và diễn giải đã được tách sạch.' },
+      { label: 'Peer review', owner: 'Knowledge Desk', status: 'Active', note: 'Đang chờ một lượt review chéo trước publish.' },
+      { label: 'Library release', owner: 'Owner / Admin', status: 'Pending', note: 'Chỉ cần cho note đi vào thư viện dùng chung sau khi review xong.' },
+    ],
+    exportArtifacts: [
+      { name: 'Legal summary 1 trang', channel: 'Workspace library', state: 'Needs approval', eta: '20m', note: 'Sẵn publish nhưng còn chờ peer review.' },
+      { name: 'Sales-safe version', channel: 'Internal share', state: 'Draft', eta: '10m', note: 'Có thể xuất thêm phiên bản ít jargon cho sale.' },
+      { name: 'Source cross-check note', channel: 'Reviewer package', state: 'Approved', eta: 'Ready now', note: 'Dùng để reviewer kiểm tra nhanh nguồn.' },
+    ],
     messages: [
       { role: 'assistant', meta: 'Knowledge Desk mode · legal synthesis', content: 'Em đã gom các căn cứ liên quan đến thoát nạn cho công trình hỗn hợp và rút thành note 1 trang để sale, kỹ thuật và hồ sơ cùng dùng chung.' },
       { role: 'user', meta: 'Need legal clarity', content: 'Tôi cần bản tóm tắt gọn, có nguồn, và chỉ ra những chỗ team hay hiểu sai khi tư vấn cho công trình hỗn hợp.' },
@@ -606,6 +642,8 @@ export const threadContextPacks: ThreadContextPack[] = [
     authStageKey: 'signup',
     authWorkspaceHint: 'Phù hợp cho người mới vào team: tạo tài khoản, gán desk, cấp scope thư viện và cho thấy họ không bị thả vào workspace một cách mù mờ.',
     authTrustNote: 'Workspace setup làm rõ owner, desk được vào, thư viện được thấy và các bước approval nếu quyền vượt chuẩn.',
+    roleLandingLabel: 'Owner cockpit',
+    roleWorkspaceState: 'Flow này mở vào setup board, seat logic và approval queue thay vì đưa user mới vào chat chung.',
     metrics: [
       { label: 'Onboarding assets', value: '06', note: 'FAQ · SOP · checklist tuần đầu · policy read list' },
       { label: 'Access scopes', value: '03', note: 'Technical Desk · shared library · assigned projects' },
@@ -635,6 +673,16 @@ export const threadContextPacks: ThreadContextPack[] = [
       { label: 'FAQ onboarding đã tạo', detail: 'Bao phủ tuần đầu, SOP cần đọc và nơi hỏi support.', done: true },
       { label: 'Checklist tuần đầu sẵn sàng', detail: 'Dùng để mentor theo dõi tiến độ.', done: true },
       { label: 'Admin approval nếu mở rộng quyền', detail: 'Giữ workspace an toàn khi tăng scope ngoài chuẩn Technical Desk.', done: false },
+    ],
+    approvalSteps: [
+      { label: 'Onboarding pack assembled', owner: 'Admin Desk', status: 'Done', note: 'FAQ + checklist + reading path đã gom đủ.' },
+      { label: 'Desk scope review', owner: 'Owner / Admin', status: 'Active', note: 'Đang kiểm tra xem user mới chỉ cần Technical Desk hay cần scope rộng hơn.' },
+      { label: 'Invite release', owner: 'Admin Desk', status: 'Pending', note: 'Chỉ gửi lời mời cuối khi quyền đã chốt rõ.' },
+    ],
+    exportArtifacts: [
+      { name: 'Onboarding checklist', channel: 'Mentor handoff', state: 'Approved', eta: 'Ready now', note: 'Có thể giao mentor ngay.' },
+      { name: 'Invite with scoped access', channel: 'Workspace invite', state: 'Needs approval', eta: '12m', note: 'Còn chờ chốt quyền trước khi gửi.' },
+      { name: 'FAQ pack', channel: 'Technical library', state: 'Draft', eta: '06m', note: 'Cần rename và polish trước khi đưa vào library.' },
     ],
     messages: [
       { role: 'assistant', meta: 'Admin Desk mode · onboarding shell', content: 'Em đang dựng bộ onboarding cho kỹ sư mới để họ vào đúng Technical Desk, thấy đúng thư viện và biết phải đọc SOP nào trong tuần đầu.' },
