@@ -1,16 +1,21 @@
 import { useMemo, useState } from 'react'
 import type {
   AccountCard,
+  AccessRow,
+  ActivityItem,
+  AuthSession,
   AuthStage,
   AuthTrustItem,
   Feature,
   FileItem,
   FlowStep,
+  HandoffStep,
   InboxItem,
   Message,
   MiniMetric,
   NavItem,
   Persona,
+  PolicyItem,
   Screen,
   Stat,
   StationCard,
@@ -20,9 +25,11 @@ import type {
   ChatThread,
 } from './data'
 import {
+  accessMatrix,
   accountCards,
   authBenefits,
   authFlowSteps,
+  authSessions,
   authStages,
   authTrustItems,
   activeThreadFiles,
@@ -32,6 +39,7 @@ import {
   chatThreads,
   conversationStates,
   personas,
+  policyItems,
   productFeatures,
   stationBoards,
   stationCards,
@@ -39,6 +47,8 @@ import {
   stationRoster,
   stationTimeline,
   suggestedPrompts,
+  threadActivities,
+  threadHandoffSteps,
   workspacePulse,
 } from './data'
 
@@ -147,11 +157,13 @@ function ThreadList({ items, activeTitle, onSelect }: { items: ChatThread[]; act
           <div className="thread-meta-row">
             <span className="badge subtle">{thread.owner}</span>
             {thread.unread && <span className="badge subtle">{thread.unread}</span>}
+            <span className={`badge subtle priority priority-${thread.priority.toLowerCase()}`}>{thread.priority}</span>
           </div>
           <div className="thread-footer-row">
             <div className="thread-state">{thread.state}</div>
             <small>{thread.sla}</small>
           </div>
+          <small className="thread-handoff-note">{thread.handoff}</small>
         </button>
       ))}
     </div>
@@ -313,6 +325,86 @@ function QueueList({ items }: { items: StationQueueItem[] }) {
   )
 }
 
+function ActivityList({ items }: { items: ActivityItem[] }) {
+  return (
+    <div className="activity-list">
+      {items.map((item) => (
+        <article className={`activity-card ${item.tone ?? 'default'}`} key={`${item.time}-${item.title}`}>
+          <small>{item.time}</small>
+          <strong>{item.title}</strong>
+          <p>{item.detail}</p>
+        </article>
+      ))}
+    </div>
+  )
+}
+
+function HandoffChecklist({ items }: { items: HandoffStep[] }) {
+  return (
+    <div className="handoff-list">
+      {items.map((item) => (
+        <article className={`handoff-card ${item.done ? 'done' : 'pending'}`} key={item.label}>
+          <div className="handoff-check">{item.done ? '✓' : '•'}</div>
+          <div>
+            <strong>{item.label}</strong>
+            <p>{item.detail}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  )
+}
+
+function SessionList({ items }: { items: AuthSession[] }) {
+  return (
+    <div className="session-list">
+      {items.map((item) => (
+        <article className="session-card" key={item.device}>
+          <div>
+            <strong>{item.device}</strong>
+            <p>{item.location}</p>
+          </div>
+          <div className="session-meta">
+            <span>{item.status}</span>
+            <small>{item.lastSeen}</small>
+          </div>
+        </article>
+      ))}
+    </div>
+  )
+}
+
+function AccessMatrix({ items }: { items: AccessRow[] }) {
+  return (
+    <div className="matrix-list">
+      {items.map((item) => (
+        <article className="matrix-card" key={item.role}>
+          <strong>{item.role}</strong>
+          <p>{item.scope}</p>
+          <div className="matrix-meta">
+            <span>{item.approval}</span>
+            <small>{item.seat}</small>
+          </div>
+        </article>
+      ))}
+    </div>
+  )
+}
+
+function PolicyList({ items }: { items: PolicyItem[] }) {
+  return (
+    <div className="policy-list">
+      {items.map((item) => (
+        <article className="policy-card" key={item.label}>
+          <strong>{item.label}</strong>
+          <p>{item.detail}</p>
+          <span>{item.status}</span>
+        </article>
+      ))}
+    </div>
+  )
+}
+
 function AuthPreview({ stage }: { stage: AuthStage }) {
   if (stage.key === 'signup') {
     return (
@@ -347,6 +439,10 @@ function AuthPreview({ stage }: { stage: AuthStage }) {
             First desk to enable
             <input value="Bid Desk" readOnly />
           </label>
+        </div>
+        <div className="approval-banner">
+          <strong>Admin setup ngay sau signup</strong>
+          <p>Hệ thống gợi bật domain allowlist, mời team lead và xác nhận ai được làm billing owner.</p>
         </div>
         <button className="primary-btn full">Tạo workspace</button>
         <p className="form-note">Sau bước này hệ thống sẽ gợi ý mời Sales Lead, Technical Lead và Bid Desk vào workspace.</p>
@@ -441,6 +537,10 @@ function AuthPreview({ stage }: { stage: AuthStage }) {
             <p>Mở dashboard cá nhân với handoff queue và quy trình follow-up khách mới.</p>
           </div>
         </div>
+        <div className="approval-banner warning">
+          <strong>Role cần owner review nếu nâng quyền</strong>
+          <p>Nếu lời mời đổi từ Sales sang Admin hoặc truy cập file toàn workspace, hệ thống sẽ giữ ở trạng thái chờ duyệt.</p>
+        </div>
         <div className="double-grid">
           <button className="secondary-btn">Xem quyền truy cập</button>
           <button className="primary-btn">Vào workspace</button>
@@ -521,15 +621,15 @@ export function HomeScreen({ heroStats, setScreen }: { heroStats: Stat[]; setScr
           <div className="hero-preview-stack">
             <div className="preview-tile highlight">
               <small>Chat management</small>
-              <strong>Thread có owner, unread, SLA, file context, artifacts và handoff cues</strong>
+              <strong>Thread có owner, priority, unread, SLA, artifacts, handoff checklist và activity rail</strong>
             </div>
             <div className="preview-tile">
               <small>Auth UX</small>
-              <strong>Login, SSO, reset, invite và signup đều có trust narrative thay vì chỉ là form đẹp</strong>
+              <strong>Login, SSO, reset, invite và signup đều có trust narrative, device/session cues và admin approval logic</strong>
             </div>
             <div className="preview-tile">
               <small>AI Station</small>
-              <strong>Có roster, queue, desks, usage và admin cues để đáng tin hơn cho môi trường doanh nghiệp</strong>
+              <strong>Có roster, queue, access matrix, policy center, seat logic và admin cues để đáng tin hơn cho môi trường doanh nghiệp</strong>
             </div>
             <div className="preview-tile">
               <small>PCCC specialization</small>
@@ -553,7 +653,7 @@ export function HomeScreen({ heroStats, setScreen }: { heroStats: Stat[]; setScr
           <span className="eyebrow">CHAT FEEL</span>
           <h2>Không còn giống một khung hỏi đáp tĩnh; giờ đã có dấu hiệu thread đang được vận hành bởi team.</h2>
           <p>
-            Owner, SLA, unread, files, output queue và pulse panel làm phần chat bớt “demo screen” và gần hơn với công cụ làm việc thật.
+            Owner, priority, handoff checklist, activity rail, unread, files, output queue và pulse panel làm phần chat bớt “demo screen” và gần hơn với công cụ làm việc thật.
           </p>
         </div>
         <div className="story-card glass-panel">
@@ -605,6 +705,12 @@ export function AuthScreen() {
 
         <FlowGrid items={authFlowSteps} />
         <TrustList items={authTrustItems} />
+
+        <div className="section-subhead">
+          <small className="sidebar-label">Session center</small>
+        </div>
+        <SessionList items={authSessions} />
+
         <FeatureGrid items={authBenefits} />
       </div>
 
@@ -623,7 +729,9 @@ export function AuthScreen() {
 
 export function ChatScreen() {
   const [activeThread, setActiveThread] = useState(chatThreads.find((item) => item.active)?.title ?? chatThreads[0].title)
+  const [composerMode, setComposerMode] = useState<'Ask' | 'Draft' | 'Extract' | 'Assign'>('Draft')
   const currentThread = useMemo(() => chatThreads.find((item) => item.title === activeThread) ?? chatThreads[0], [activeThread])
+  const threadHealth = currentThread.priority === 'Critical' ? 'Owner visibility recommended' : currentThread.priority === 'High' ? 'Desk lead should monitor' : 'Routine handling is enough'
 
   return (
     <section className="chat-shell-layout expanded-chat">
@@ -659,12 +767,13 @@ export function ChatScreen() {
         <div className="chat-head-row">
           <div>
             <span className="eyebrow">CHATGPT-LIKE SHELL · PCCC MODE</span>
-            <h2>Khung chat quen thuộc, nhưng đã có owner, SLA, file stack và output handoff như một công cụ làm việc thật</h2>
+            <h2>Khung chat quen thuộc, nhưng đã có owner, SLA, file stack, priority và output handoff như một công cụ làm việc thật</h2>
           </div>
           <div className="header-tags">
             <span>Hồ sơ thầu</span>
             <span>Nhà xưởng Bình Dương</span>
             <span>{currentThread.owner}</span>
+            <span>{currentThread.priority}</span>
           </div>
         </div>
 
@@ -673,7 +782,7 @@ export function ChatScreen() {
         <div className="chat-title-strip">
           <div>
             <strong>{activeThread}</strong>
-            <p>Đang dùng cùng project context, shared files và note kỹ thuật để tránh lệch output. Owner hiện tại: {currentThread.owner}.</p>
+            <p>Đang dùng cùng project context, shared files và note kỹ thuật để tránh lệch output. Owner hiện tại: {currentThread.owner}. Handoff state: {currentThread.handoff}.</p>
           </div>
           <div className="title-actions">
             <button className="secondary-btn slim">Rename</button>
@@ -683,13 +792,41 @@ export function ChatScreen() {
           </div>
         </div>
 
+        <div className="signal-strip glass-panel">
+          <div>
+            <small>Thread health</small>
+            <strong>{threadHealth}</strong>
+          </div>
+          <div>
+            <small>SLA</small>
+            <strong>{currentThread.sla}</strong>
+          </div>
+          <div>
+            <small>Handoff</small>
+            <strong>{currentThread.handoff}</strong>
+          </div>
+        </div>
+
         <MessageList items={chatMessages} />
 
-        <div className="section-subhead">
-          <small className="sidebar-label">Artifacts & source files</small>
+        <div className="chat-detail-grid">
+          <div>
+            <div className="section-subhead">
+              <small className="sidebar-label">Artifacts & source files</small>
+            </div>
+            <FileList items={activeThreadFiles} />
+          </div>
+          <div>
+            <div className="section-subhead">
+              <small className="sidebar-label">Handoff checklist</small>
+            </div>
+            <HandoffChecklist items={threadHandoffSteps} />
+          </div>
         </div>
-        <FileList items={activeThreadFiles} />
 
+        <div className="section-subhead">
+          <small className="sidebar-label">Suggested prompts</small>
+        </div>
         <div className="prompt-row">
           {suggestedPrompts.map((prompt) => (
             <button className="chip-btn" key={prompt}>{prompt}</button>
@@ -697,14 +834,15 @@ export function ChatScreen() {
         </div>
 
         <div className="composer-mode-row">
-          <span className="badge">Ask</span>
-          <span className="badge subtle">Draft</span>
-          <span className="badge subtle">Extract</span>
-          <span className="badge subtle">Assign</span>
+          {(['Ask', 'Draft', 'Extract', 'Assign'] as const).map((mode) => (
+            <button key={mode} className={`badge mode-chip ${composerMode === mode ? 'active' : 'subtle'}`} onClick={() => setComposerMode(mode)}>
+              {mode}
+            </button>
+          ))}
         </div>
         <div className="composer-row">
           <div className="upload-box">+ Tải PDF, DOCX, XLSX, ảnh, hồ sơ thầu hoặc công văn</div>
-          <div className="composer-box">Mô tả yêu cầu, dán nội dung, hoặc kéo thả hồ sơ vào đây…</div>
+          <div className="composer-box">{composerMode === 'Assign' ? 'Chỉ định desk nhận việc, mô tả handoff và nêu rõ deadline…' : composerMode === 'Extract' ? 'Chọn phần cần bóc: tiêu chuẩn, thiết bị, checklist, căn cứ pháp lý…' : composerMode === 'Draft' ? 'Soạn email, Zalo, checklist hoặc note kỹ thuật từ context hiện tại…' : 'Mô tả yêu cầu, dán nội dung, hoặc kéo thả hồ sơ vào đây…'}</div>
           <button className="primary-btn composer-send">Gửi</button>
         </div>
         <div className="composer-footnote">
@@ -730,9 +868,13 @@ export function ChatScreen() {
             ))}
           </div>
         </div>
+        <div className="side-block">
+          <small className="sidebar-label">Activity rail</small>
+          <ActivityList items={threadActivities} />
+        </div>
         <div className="side-block emphasis">
           <small className="sidebar-label">Thread controls</small>
-          <p>Cho thấy hướng sản phẩm: assign owner, track unread, export artifact, archive xong việc và giữ decision trail theo từng thread.</p>
+          <p>Cho thấy hướng sản phẩm: assign owner, track unread, export artifact, archive xong việc, giữ decision trail và buộc handoff rõ theo từng thread.</p>
         </div>
       </aside>
     </section>
@@ -767,6 +909,11 @@ export function StationScreen({ signals }: { signals: Stat[] }) {
             <small className="sidebar-label">Team roster</small>
           </div>
           <TeamGrid items={stationRoster} />
+
+          <div className="section-subhead roomy">
+            <small className="sidebar-label">Access matrix</small>
+          </div>
+          <AccessMatrix items={accessMatrix} />
         </div>
 
         <div className="station-right glass-panel">
@@ -785,11 +932,16 @@ export function StationScreen({ signals }: { signals: Stat[] }) {
           </div>
           <QueueList items={stationQueue} />
 
+          <div className="section-subhead roomy">
+            <small className="sidebar-label">Policy center</small>
+          </div>
+          <PolicyList items={policyItems} />
+
           <div className="side-block emphasis">
             <small className="sidebar-label">Admin direction</small>
             <p>
               Station này đã đủ sức kể đường productization: owner center, trusted entry, desk-based workspace,
-              shared library, queue visibility, audit summary và billing ownership trong cùng một narrative.
+              shared library, queue visibility, audit summary, role matrix và billing ownership trong cùng một narrative.
             </p>
           </div>
         </div>

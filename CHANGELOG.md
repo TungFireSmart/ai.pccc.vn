@@ -23,3 +23,6 @@
 - Shipped the next Milestone 3 checkpoint: chat management now includes ownership, SLA/unread cues, artifact/file context, and stronger thread controls.
 - Strengthened auth UX with trust-state messaging, device/session/security cues, richer signup/SSO/reset/invite states, and clearer workspace-entry framing.
 - Upgraded AI Station with team roster, handoff queue, usage/admin cues, and a more credible operating-layer narrative for productization review.
+- Deepened the next checkpoint with richer operational state: chat thread priority + handoff checklist + activity rail + composer modes.
+- Strengthened auth/admin trust with session center, approval messaging, recovery clarity, and more realistic workspace-entry states.
+- Added AI Station access matrix and policy center so role scope, seat logic, and workspace governance feel more productized.

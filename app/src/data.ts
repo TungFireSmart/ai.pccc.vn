@@ -15,6 +15,8 @@ export type ChatThread = {
   owner: string
   unread?: string
   sla: string
+  priority: 'Critical' | 'High' | 'Normal'
+  handoff: string
 }
 export type StationCard = { title: string; description: string; items: string[] }
 export type WorkspaceBoard = { title: string; status: string; summary: string }
@@ -33,6 +35,11 @@ export type FileItem = { name: string; kind: string; status: string }
 export type AuthTrustItem = { label: string; detail: string; tone?: 'default' | 'good' | 'warning' }
 export type TeamMember = { name: string; role: string; status: string; focus: string }
 export type StationQueueItem = { task: string; owner: string; eta: string; status: string }
+export type ActivityItem = { time: string; title: string; detail: string; tone?: 'default' | 'good' | 'warning' }
+export type HandoffStep = { label: string; detail: string; done: boolean }
+export type AuthSession = { device: string; location: string; status: string; lastSeen: string }
+export type AccessRow = { role: string; scope: string; approval: string; seat: string }
+export type PolicyItem = { label: string; detail: string; status: string }
 
 export const navItems: NavItem[] = [
   { key: 'home', label: 'Trang chủ' },
@@ -50,19 +57,19 @@ export const heroStats: Stat[] = [
 export const productFeatures: Feature[] = [
   {
     title: 'Chat management giống SaaS vận hành thật',
-    description: 'Thread có owner, SLA, unread, action state, file context, output queue và workspace pulse để người duyệt thấy được nhịp điều phối thật.',
+    description: 'Thread có owner, SLA, priority, handoff checklist, activity rail, file context, output queue và workspace pulse để người duyệt thấy được nhịp điều phối thật.',
   },
   {
     title: 'Auth UX không chỉ “đăng nhập” mà là “vào đúng workspace, đúng quyền, đúng mức tin cậy”',
-    description: 'Có trust checks, MFA/recovery, session context, invite review và message giải thích để flow nhìn đủ chín cho môi trường doanh nghiệp.',
+    description: 'Có trust checks, phiên đăng nhập hiện hữu, device recognition, invite scope, admin approval cues và message giải thích để flow nhìn đủ chín cho môi trường doanh nghiệp.',
   },
   {
     title: 'AI Station trở thành tầng điều hành, không chỉ là trang admin tượng trưng',
-    description: 'Có team roster, handoff queue, workspace desks, usage logic, policy/audit cues và tình trạng library để câu chuyện enterprise đáng tin hơn.',
+    description: 'Có team roster, handoff queue, workspace desks, access matrix, policy center, seat logic, usage logic, audit cues và tình trạng library để câu chuyện enterprise đáng tin hơn.',
   },
   {
     title: 'PCCC Vietnam vẫn là lõi sản phẩm',
-    description: 'Mẫu thread, artifact, desk, task queue và auth copy đều bám sát sale, kỹ thuật, hồ sơ, công văn và thư viện nội bộ ngành PCCC.',
+    description: 'Mẫu thread, artifact, desk, task queue, policy và auth copy đều bám sát sale, kỹ thuật, hồ sơ, công văn và thư viện nội bộ ngành PCCC.',
   },
 ]
 
@@ -130,11 +137,11 @@ export const authStages: AuthStage[] = [
 export const authBenefits: Feature[] = [
   {
     title: 'Trust ngay trong giao diện',
-    description: 'Workspace match, device recognition, session notice, OTP/MFA và invite scope giúp auth nhìn đáng tin hơn hẳn bản form tĩnh.',
+    description: 'Workspace match, device recognition, active sessions, OTP/MFA và invite scope giúp auth nhìn đáng tin hơn hẳn bản form tĩnh.',
   },
   {
     title: 'Onboarding nói đúng ngôn ngữ doanh nghiệp PCCC',
-    description: 'Use case ưu tiên, desk assignment, library access và owner billing được đặt ngay trong flow tạo tài khoản.',
+    description: 'Use case ưu tiên, desk assignment, library access, admin approval và owner billing được đặt ngay trong flow tạo tài khoản.',
   },
   {
     title: 'Đủ nền cho enterprise path',
@@ -158,6 +165,8 @@ export const chatThreads: ChatThread[] = [
     owner: 'Bid Desk',
     unread: '03 updates',
     sla: 'Deadline 17:00',
+    priority: 'Critical',
+    handoff: 'Need technical sign-off',
     active: true,
   },
   {
@@ -169,6 +178,8 @@ export const chatThreads: ChatThread[] = [
     owner: 'Sales Desk',
     unread: 'Customer pending',
     sla: 'Reply under 30m',
+    priority: 'High',
+    handoff: 'Waiting final customer contact fields',
   },
   {
     title: 'Tra cứu căn cứ thoát nạn công trình hỗn hợp',
@@ -179,6 +190,8 @@ export const chatThreads: ChatThread[] = [
     owner: 'Knowledge Desk',
     unread: 'No unread',
     sla: 'Need peer review',
+    priority: 'Normal',
+    handoff: 'Peer review before publish',
   },
   {
     title: 'Onboarding kỹ sư mới vào thư viện nội bộ',
@@ -189,6 +202,8 @@ export const chatThreads: ChatThread[] = [
     owner: 'Admin Desk',
     unread: '01 suggestion',
     sla: 'Template upkeep',
+    priority: 'Normal',
+    handoff: 'Ready for template cleanup',
   },
 ]
 
@@ -255,11 +270,31 @@ export const activeThreadFiles: FileItem[] = [
   { name: 'Mail_mau_phan_viec.msg', kind: 'Template', status: 'Ready for export' },
 ]
 
+export const threadActivities: ActivityItem[] = [
+  { time: '10:12', title: 'Bid Desk khóa context dự án', detail: 'Thread đang dùng chung 4 file và checklist nội bộ của phòng hồ sơ.', tone: 'good' },
+  { time: '10:18', title: 'AI tạo risk flags đầu tiên', detail: 'Đánh dấu thiếu biểu mẫu tiến độ, nhân sự chủ chốt và xuất xứ thiết bị.' },
+  { time: '10:24', title: 'Technical review được yêu cầu', detail: 'Handoff sang Technical Desk để xác nhận 3 hạng mục thiết bị.', tone: 'warning' },
+  { time: '10:31', title: 'Owner visibility bật', detail: 'Thread được đẩy vào vùng theo dõi ưu tiên vì deadline còn dưới 7 giờ.' },
+]
+
+export const threadHandoffSteps: HandoffStep[] = [
+  { label: 'Checklist nội bộ đã tạo', detail: '18 mục với 3 flag đỏ và deadline 17:00.', done: true },
+  { label: 'Email phân việc đã sẵn sàng', detail: 'Có bản nháp cho sale, kỹ thuật và hồ sơ.', done: true },
+  { label: 'Technical sign-off', detail: 'Còn xác nhận model thiết bị và biểu mẫu tiến độ.', done: false },
+  { label: 'Owner review trước khi export', detail: 'Đề nghị duyệt nhanh các mục risk trước khi gửi final.', done: false },
+]
+
 export const authTrustItems: AuthTrustItem[] = [
   { label: 'Workspace match', detail: 'Email admin@pccc.vn khớp workspace AI Station PCCC Vietnam', tone: 'good' },
   { label: 'Trusted device', detail: 'Chrome on MacBook của anh đã từng đăng nhập 18 lần trong 30 ngày qua', tone: 'good' },
   { label: 'Session notice', detail: 'Có 1 phiên đang hoạt động tại văn phòng Hà Nội · xem và thu hồi trong Account Center' },
   { label: 'Fallback recovery', detail: 'Recovery email + mã 2FA backup luôn được hiển thị như một lối thoát an toàn', tone: 'warning' },
+]
+
+export const authSessions: AuthSession[] = [
+  { device: 'MacBook Pro · Chrome', location: 'Hà Nội office', status: 'Current session', lastSeen: 'Đang hoạt động' },
+  { device: 'iPhone · Safari', location: 'Hà Nội', status: 'Trusted mobile', lastSeen: '17 phút trước' },
+  { device: 'Windows laptop · Edge', location: 'TP.HCM', status: 'Needs review', lastSeen: '2 ngày trước' },
 ]
 
 export const stationSignals: Stat[] = [
@@ -347,4 +382,17 @@ export const stationQueue: StationQueueItem[] = [
   { task: 'Gửi draft phản hồi lead tủ bơm', owner: 'Sales Desk', eta: '08m', status: 'Ready to ship' },
   { task: 'Chuẩn hóa SOP nghiệm thu thành FAQ', owner: 'Knowledge Desk', eta: '45m', status: 'In progress' },
   { task: 'Rà role guest cho đối tác hồ sơ', owner: 'Admin Desk', eta: 'Today', status: 'Pending approval' },
+]
+
+export const accessMatrix: AccessRow[] = [
+  { role: 'Owner', scope: 'Toàn bộ workspace · billing · policy · audit', approval: 'Không cần', seat: '1 / 1' },
+  { role: 'Sales Lead', scope: 'Sales Desk + shared projects + customer threads', approval: 'Owner/Admin', seat: '2 / 3' },
+  { role: 'Technical', scope: 'Technical Desk + project files được chia sẻ', approval: 'Admin', seat: '2 / 4' },
+  { role: 'Guest partner', scope: '1 project cụ thể + file được chỉ định', approval: 'Owner review', seat: '1 / 5' },
+]
+
+export const policyItems: PolicyItem[] = [
+  { label: 'Domain allowlist', detail: 'Chỉ email @pccc.vn và lời mời hợp lệ mới vào workspace chính.', status: 'Active' },
+  { label: 'Guest project isolation', detail: 'Khách/đối tác chỉ thấy đúng project được chia sẻ, không thấy thread nội bộ khác.', status: 'Enabled' },
+  { label: 'High-risk export review', detail: 'Artifact có gắn cờ đỏ phải qua owner hoặc desk lead trước khi gửi ra ngoài.', status: 'Needs owner review' },
 ]

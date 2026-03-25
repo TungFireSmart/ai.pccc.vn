@@ -5,14 +5,16 @@ Milestone 3 — **Pre-approval candidate (next checkpoint depth pass)**
 
 ## Current status
 - Milestone 2 đã hoàn tất cho review nội bộ
-- Milestone 3 đã được đẩy tới mốc **freeze-for-review** theo hướng decision-ready
+- Milestone 3 vẫn giữ hướng **decision-ready**, nhưng app đã được đẩy thêm một checkpoint sâu hơn thay vì chỉ đứng ở freeze copy
 - Frontend build đang pass ổn định
 - Narrative, walkthrough, approval-prep, và go-live-after-approval docs đã có
-- App đã có review-quickbar, pre-approval check deck, decision strip, owner decision panel, và after-approval roadmap block để hỗ trợ duyệt nhanh hơn
+- App hiện đã có review-quickbar, pre-approval check deck, decision strip, owner decision panel, after-approval roadmap block, cùng lớp interaction mới cho chat/auth/station
 
 ## Những gì mạnh nhất lúc này
 - Định vị AI chuyên ngành PCCC đã rõ
-- Workspace có chiều sâu hơn nhờ scenario theo từng agent
+- Chat shell đã có cảm giác vận hành hơn nhờ priority, handoff checklist, activity rail và composer mode
+- Auth flow đã có trust depth rõ hơn nhờ session center, device cues và approval messaging
+- AI Station đã đáng tin hơn nhờ access matrix, policy center và seat/role framing
 - Bộ tài liệu duyệt đã chuyển từ “xem giao diện” sang “ra quyết định” rõ hơn
 
 ## Những gì còn có thể tiếp tục tăng lực

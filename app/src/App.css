@@ -84,7 +84,20 @@ button {
 .account-head strong,
 .stack-card strong,
 .chat-title-strip strong,
-.invite-card strong {
+.invite-card strong,
+.metric-card strong,
+.file-card strong,
+.trust-card strong,
+.team-card strong,
+.queue-card strong,
+.mini-check-card strong,
+.activity-card strong,
+.handoff-card strong,
+.session-card strong,
+.matrix-card strong,
+.policy-card strong,
+.signal-strip strong,
+.approval-banner strong {
   display: block;
   color: #f7fbff;
 }
@@ -116,7 +129,20 @@ button {
 .stack-card p,
 .composer-footnote,
 .invite-card p,
-.form-note {
+.form-note,
+.metric-card p,
+.file-card p,
+.trust-card p,
+.team-card p,
+.queue-card p,
+.mini-check-card p,
+.activity-card p,
+.handoff-card p,
+.session-card p,
+.matrix-card p,
+.policy-card p,
+.signal-strip small,
+.approval-banner p {
   color: #9eb2ca;
 }
 
@@ -131,7 +157,8 @@ button {
 .chip-btn,
 .social-btn,
 .text-link,
-.auth-tab-row button {
+.auth-tab-row button,
+.mode-chip {
   cursor: pointer;
 }
 
@@ -155,7 +182,17 @@ button {
 .auth-tab-row button:hover,
 .account-card:hover,
 .stack-card:hover,
-.flow-card:hover {
+.flow-card:hover,
+.metric-card:hover,
+.file-card:hover,
+.trust-card:hover,
+.team-card:hover,
+.queue-card:hover,
+.activity-card:hover,
+.handoff-card:hover,
+.session-card:hover,
+.matrix-card:hover,
+.policy-card:hover {
   transform: translateY(-2px);
   border-color: rgba(120, 169, 255, 0.24);
 }
@@ -164,7 +201,8 @@ button {
 .primary-btn,
 .thread-card.active,
 .social-btn,
-.auth-tab-row button.active {
+.auth-tab-row button.active,
+.mode-chip.active {
   color: #05111b;
   background: linear-gradient(135deg, #7bf5e7, #78a9ff);
   border-color: transparent;
@@ -196,7 +234,20 @@ button {
 .search-chip,
 .chat-title-strip,
 .highlight-panel,
-.invite-card {
+.invite-card,
+.metric-card,
+.file-card,
+.trust-card,
+.team-card,
+.queue-card,
+.mini-check-card,
+.activity-card,
+.handoff-card,
+.session-card,
+.matrix-card,
+.policy-card,
+.signal-strip,
+.approval-banner {
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.03));
   box-shadow: 0 22px 70px rgba(0, 0, 0, 0.28);
@@ -238,7 +289,10 @@ button {
 .header-tags span,
 .badge,
 .account-head span,
-.thread-state {
+.thread-state,
+.session-meta span,
+.matrix-meta span,
+.policy-card span {
   padding: 8px 11px;
   border-radius: 999px;
   font-size: 12px;
@@ -252,10 +306,27 @@ button {
   margin-top: 10px;
 }
 
-.badge.subtle {
+.badge.subtle,
+.mode-chip.subtle {
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.08);
   color: #d9e8f8;
+}
+
+.priority-critical {
+  border-color: rgba(255, 124, 124, 0.36);
+  background: rgba(255, 86, 86, 0.14);
+  color: #ffd2d2;
+}
+
+.priority-high {
+  border-color: rgba(255, 206, 96, 0.34);
+  background: rgba(255, 206, 96, 0.12);
+  color: #ffe7a9;
+}
+
+.priority-normal {
+  border-color: rgba(120, 169, 255, 0.16);
 }
 
 .mini-tags.right {
@@ -342,7 +413,8 @@ button {
 .composer-box,
 .auth-form-shell input,
 .thread-card,
-.search-chip {
+.search-chip,
+.mode-chip {
   color: #dbe8f8;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -393,7 +465,12 @@ button {
 .station-grid,
 .stat-grid,
 .flow-grid,
-.account-grid {
+.account-grid,
+.activity-list,
+.handoff-list,
+.session-list,
+.matrix-list,
+.policy-list {
   display: grid;
   gap: 16px;
 }
@@ -412,22 +489,37 @@ button {
 .board-card,
 .station-card,
 .flow-card,
-.account-card {
+.account-card,
+.activity-card,
+.handoff-card,
+.session-card,
+.matrix-card,
+.policy-card,
+.signal-strip,
+.approval-banner {
   padding: 18px;
   border-radius: 22px;
 }
 
 .preview-tile.highlight,
 .highlight-panel,
-.side-block.emphasis {
+.side-block.emphasis,
+.signal-strip,
+.approval-banner {
   background: linear-gradient(135deg, rgba(123, 245, 231, 0.12), rgba(120, 169, 255, 0.1));
+}
+
+.approval-banner.warning {
+  background: linear-gradient(180deg, rgba(255, 196, 92, 0.12), rgba(255, 255, 255, 0.03));
 }
 
 .stat-card small,
 .board-card small,
 .sidebar-label,
 .thread-card-top span,
-.invite-card small {
+.invite-card small,
+.activity-card small,
+.signal-strip small {
   display: block;
   margin-bottom: 10px;
   font-size: 12px;
@@ -612,7 +704,8 @@ button {
 .signup-box p,
 .highlight-panel p,
 .form-note,
-.invite-card p {
+.invite-card p,
+.approval-banner p {
   margin: 0;
   line-height: 1.7;
 }
@@ -659,7 +752,12 @@ button {
 .thread-list,
 .message-list,
 .timeline-list,
-.stack-list {
+.stack-list,
+.queue-list,
+.file-list,
+.trust-list,
+.team-grid,
+.metric-grid {
   display: grid;
   gap: 12px;
 }
@@ -678,8 +776,16 @@ button {
   align-items: center;
 }
 
-.thread-card-top small {
+.thread-card-top small,
+.thread-handoff-note,
+.session-meta small,
+.matrix-meta small {
   color: #8ba4c0;
+}
+
+.thread-handoff-note {
+  display: block;
+  margin-top: 10px;
 }
 
 .chat-head-row {
@@ -726,6 +832,17 @@ button {
   justify-content: flex-end;
 }
 
+.signal-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.signal-strip strong {
+  font-size: 16px;
+}
+
 .message-row {
   display: grid;
   grid-template-columns: 44px 1fr;
@@ -764,11 +881,17 @@ button {
   margin-bottom: 8px;
 }
 
+.chat-detail-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 16px;
+}
+
 .prompt-row {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-  margin: 20px 0 16px;
+  margin: 10px 0 16px;
 }
 
 .chip-btn {
@@ -821,11 +944,15 @@ button {
   border-radius: 16px;
 }
 
-.stack-card.good {
+.stack-card.good,
+.activity-card.good,
+.handoff-card.done {
   border-color: rgba(123, 245, 231, 0.22);
 }
 
-.stack-card.warning {
+.stack-card.warning,
+.activity-card.warning,
+.handoff-card.pending {
   border-color: rgba(255, 141, 141, 0.24);
   background: linear-gradient(180deg, rgba(255, 111, 111, 0.08), rgba(255, 255, 255, 0.03));
 }
@@ -873,15 +1000,6 @@ button {
 }
 
 .metric-grid,
-.file-list,
-.trust-list,
-.team-grid,
-.queue-list {
-  display: grid;
-  gap: 12px;
-}
-
-.metric-grid,
 .team-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -891,22 +1009,14 @@ button {
 .trust-card,
 .team-card,
 .queue-card,
-.mini-check-card {
+.mini-check-card,
+.activity-card,
+.handoff-card,
+.session-card,
+.matrix-card,
+.policy-card {
   padding: 16px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.03));
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.2);
-}
-
-.metric-card strong,
-.file-card strong,
-.trust-card strong,
-.team-card strong,
-.queue-card strong,
-.mini-check-card strong {
-  display: block;
-  color: #f7fbff;
 }
 
 .metric-card p,
@@ -915,9 +1025,13 @@ button {
 .team-card p,
 .queue-card p,
 .mini-check-card p,
+.activity-card p,
+.handoff-card p,
+.session-card p,
+.matrix-card p,
+.policy-card p,
 .metric-card small,
 .team-card small {
-  color: #9eb2ca;
   margin: 0;
   line-height: 1.7;
 }
@@ -937,7 +1051,9 @@ button {
 .thread-meta-row,
 .thread-footer-row,
 .composer-mode-row,
-.team-card-head {
+.team-card-head,
+.session-card,
+.matrix-meta {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
@@ -969,7 +1085,10 @@ button {
 }
 
 .file-card,
-.queue-card {
+.queue-card,
+.session-card,
+.matrix-card,
+.policy-card {
   display: flex;
   justify-content: space-between;
   gap: 14px;
@@ -978,11 +1097,21 @@ button {
 
 .file-card span,
 .queue-card span,
-.team-card-head span {
+.team-card-head span,
+.session-meta span,
+.matrix-meta span,
+.policy-card span {
   padding: 7px 10px;
   border-radius: 999px;
   background: rgba(120, 169, 255, 0.12);
   border: 1px solid rgba(120, 169, 255, 0.16);
+}
+
+.session-meta,
+.matrix-meta {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
 }
 
 .trust-card.good {
@@ -1006,6 +1135,33 @@ button {
   margin: 18px 0 10px;
 }
 
+.mode-chip {
+  min-height: auto;
+  padding: 10px 14px;
+}
+
+.handoff-card {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.handoff-check {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  color: #eef6ff;
+  font-weight: 700;
+}
+
+.activity-card small {
+  margin-bottom: 8px;
+}
+
 @media (max-width: 1280px) {
   .hero-panel,
   .auth-layout,
@@ -1020,7 +1176,9 @@ button {
   .flow-grid,
   .account-grid,
   .metric-grid,
-  .team-grid {
+  .team-grid,
+  .chat-detail-grid,
+  .signal-strip {
     grid-template-columns: 1fr;
   }
 
@@ -1028,9 +1186,17 @@ button {
   .chat-head-row,
   .auth-row,
   .chat-title-strip,
-  .stage-summary {
+  .stage-summary,
+  .session-card,
+  .matrix-card,
+  .policy-card {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .session-meta,
+  .matrix-meta {
+    justify-items: start;
   }
 }
 
@@ -1059,7 +1225,11 @@ button {
   }
 
   .composer-row,
-  .double-grid {
+  .double-grid,
+  .hero-preview-stack,
+  .stat-grid,
+  .board-grid,
+  .account-grid {
     grid-template-columns: 1fr;
   }
 }
