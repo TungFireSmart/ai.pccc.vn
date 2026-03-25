@@ -247,7 +247,11 @@ button {
 .matrix-card,
 .policy-card,
 .signal-strip,
-.approval-banner {
+.approval-banner,
+.pilot-track-card,
+.usecase-fit-card,
+.workflow-snapshot-card,
+.lane-card {
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.03));
   box-shadow: 0 22px 70px rgba(0, 0, 0, 0.28);
@@ -496,7 +500,11 @@ button {
 .matrix-card,
 .policy-card,
 .signal-strip,
-.approval-banner {
+.approval-banner,
+.pilot-track-card,
+.usecase-fit-card,
+.workflow-snapshot-card,
+.lane-card {
   padding: 18px;
   border-radius: 22px;
 }
@@ -534,6 +542,98 @@ button {
 .flow-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+
+
+.pilot-track-grid,
+.usecase-fit-grid,
+.workflow-snapshot-grid,
+.workflow-board,
+.lane-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.pilot-track-grid,
+.usecase-fit-grid,
+.workflow-snapshot-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.workflow-board {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 8px;
+}
+
+.pilot-track-card,
+.usecase-fit-card,
+.workflow-snapshot-card,
+.workflow-lane {
+  border-radius: 22px;
+}
+
+.pilot-track-card,
+.usecase-fit-card,
+.workflow-snapshot-card {
+  padding: 18px;
+}
+
+.workflow-snapshot-card.emphasis,
+.workflow-lane {
+  background: rgba(10, 18, 30, 0.72);
+  backdrop-filter: blur(18px);
+}
+
+.pilot-track-card p,
+.usecase-fit-card p,
+.workflow-snapshot-card p,
+.lane-card p {
+  margin: 8px 0 0;
+  line-height: 1.7;
+  color: #a9bed4;
+}
+
+.pilot-track-card strong,
+.usecase-fit-card strong,
+.workflow-snapshot-card strong,
+.lane-card strong,
+.lane-head span {
+  display: block;
+  color: #f7fbff;
+}
+
+.workflow-lane {
+  padding: 18px;
+}
+
+.lane-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.lane-head span {
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: rgba(120, 169, 255, 0.12);
+  border: 1px solid rgba(120, 169, 255, 0.16);
+}
+
+.lane-card.good {
+  border-color: rgba(123, 245, 231, 0.22);
+}
+
+.lane-card.warning {
+  border-color: rgba(255, 141, 141, 0.24);
+  background: linear-gradient(180deg, rgba(255, 111, 111, 0.08), rgba(255, 255, 255, 0.03));
+}
+
+.thread-footer-row.compact {
+  margin-top: 0;
+}
+
 
 .story-layout {
   display: grid;
@@ -1178,7 +1278,11 @@ button {
   .metric-grid,
   .team-grid,
   .chat-detail-grid,
-  .signal-strip {
+  .signal-strip,
+  .pilot-track-grid,
+  .usecase-fit-grid,
+  .workflow-snapshot-grid,
+  .workflow-board {
     grid-template-columns: 1fr;
   }
 

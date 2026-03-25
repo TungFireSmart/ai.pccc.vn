@@ -46,6 +46,159 @@ import {
   suggestedPrompts,
 } from './data'
 
+
+const pilotTracks = [
+  {
+    title: 'Use case clarity',
+    status: 'Strong',
+    detail: 'Sale · kỹ thuật · hồ sơ · knowledge · onboarding đều đã có câu chuyện, đầu ra và quyền đi kèm.',
+  },
+  {
+    title: 'Workflow realism',
+    status: 'Improving',
+    detail: 'Thread đã có owner, SLA, handoff, file stack và output rail; checkpoint này đẩy thêm execution layer và next-step guidance.',
+  },
+  {
+    title: 'Enterprise trust',
+    status: 'Credible',
+    detail: 'Auth có device/session/invite/domain cues; AI Station có access matrix, queue, policy center và admin direction.',
+  },
+]
+
+const useCaseFit = [
+  {
+    title: 'Lead nóng cần phản hồi nhanh',
+    fit: 'High fit',
+    note: 'Chat giữ SLA, nhắc thiếu dữ liệu, gắn handoff sang sale hoặc kỹ thuật mà không mất context.',
+  },
+  {
+    title: 'Rà HSMT / hồ sơ deadline gấp',
+    fit: 'High fit',
+    note: 'Thread có artifact queue, risk flags, owner visibility và checklist bàn giao để tránh hụt bước.',
+  },
+  {
+    title: 'Tra cứu căn cứ + đưa vào thư viện',
+    fit: 'Good fit',
+    note: 'Knowledge flow đã có nguồn, peer-review cues và station policy để kiểm soát publish.',
+  },
+  {
+    title: 'Onboarding thành viên mới',
+    fit: 'Good fit',
+    note: 'Auth + station kể được câu chuyện workspace entry, desk scope, session trust và role elevation.',
+  },
+]
+
+function WorkflowSnapshot({ activeContext }: { activeContext: ThreadContextPack }) {
+  const completed = activeContext.handoffSteps.filter((item) => item.done).length
+  const total = activeContext.handoffSteps.length
+  const progress = Math.round((completed / Math.max(total, 1)) * 100)
+  const blockers = activeContext.handoffSteps.filter((item) => !item.done)
+  const nextAction = blockers[0]?.detail ?? 'Thread đã đủ điều kiện để export hoặc lưu làm template.'
+
+  return (
+    <div className="workflow-snapshot-grid">
+      <article className="workflow-snapshot-card emphasis">
+        <small className="sidebar-label">Execution score</small>
+        <strong>{progress}% ready</strong>
+        <p>{completed}/{total} handoff step hoàn tất. Thread đang bám theo {activeContext.stationFocus.reviewLabel.toLowerCase()} để tránh rơi khỏi nhịp duyệt.</p>
+      </article>
+      <article className="workflow-snapshot-card">
+        <small className="sidebar-label">Next unblock</small>
+        <strong>{blockers[0]?.label ?? 'Ready to ship'}</strong>
+        <p>{nextAction}</p>
+      </article>
+      <article className="workflow-snapshot-card">
+        <small className="sidebar-label">Artifacts in motion</small>
+        <strong>{activeContext.outputs.length} outputs</strong>
+        <p>{activeContext.outputs.slice(0, 2).join(' · ')}</p>
+      </article>
+    </div>
+  )
+}
+
+function PilotTrackGrid() {
+  return (
+    <div className="pilot-track-grid">
+      {pilotTracks.map((item) => (
+        <article className="pilot-track-card" key={item.title}>
+          <small className="sidebar-label">{item.status}</small>
+          <strong>{item.title}</strong>
+          <p>{item.detail}</p>
+        </article>
+      ))}
+    </div>
+  )
+}
+
+function UseCaseFitGrid() {
+  return (
+    <div className="usecase-fit-grid">
+      {useCaseFit.map((item) => (
+        <article className="usecase-fit-card" key={item.title}>
+          <div className="thread-footer-row compact">
+            <strong>{item.title}</strong>
+            <span className="badge subtle">{item.fit}</span>
+          </div>
+          <p>{item.note}</p>
+        </article>
+      ))}
+    </div>
+  )
+}
+
+function WorkflowBoard({ activeContext }: { activeContext: ThreadContextPack }) {
+  const queued = activeContext.outputs
+  const pending = activeContext.handoffSteps.filter((item) => !item.done)
+  const done = activeContext.handoffSteps.filter((item) => item.done)
+
+  return (
+    <div className="workflow-board">
+      <article className="workflow-lane glass-panel">
+        <div className="lane-head">
+          <small className="sidebar-label">Queued outputs</small>
+          <span>{queued.length}</span>
+        </div>
+        <div className="lane-stack">
+          {queued.map((item) => (
+            <div className="lane-card" key={item}>
+              <strong>{item}</strong>
+              <p>Đang bám theo context hiện tại để xuất bản không lệch brief.</p>
+            </div>
+          ))}
+        </div>
+      </article>
+      <article className="workflow-lane glass-panel">
+        <div className="lane-head">
+          <small className="sidebar-label">Waiting review</small>
+          <span>{pending.length}</span>
+        </div>
+        <div className="lane-stack">
+          {pending.map((item) => (
+            <div className="lane-card warning" key={item.label}>
+              <strong>{item.label}</strong>
+              <p>{item.detail}</p>
+            </div>
+          ))}
+        </div>
+      </article>
+      <article className="workflow-lane glass-panel">
+        <div className="lane-head">
+          <small className="sidebar-label">Completed</small>
+          <span>{done.length}</span>
+        </div>
+        <div className="lane-stack">
+          {done.map((item) => (
+            <div className="lane-card good" key={item.label}>
+              <strong>{item.label}</strong>
+              <p>{item.detail}</p>
+            </div>
+          ))}
+        </div>
+      </article>
+    </div>
+  )
+}
+
 export function TopNav({
   items,
   screen,
@@ -589,6 +742,14 @@ function AuthPreview({ stage }: { stage: AuthStage }) {
 export function HomeScreen({ heroStats, setScreen }: { heroStats: Stat[]; setScreen: (screen: Screen) => void }) {
   return (
     <>
+      <section className="section-block">
+        <div className="section-head">
+          <span className="eyebrow">PILOT SIGNAL</span>
+          <h2>Checkpoint này bắt đầu nói bằng ngôn ngữ internal pilot thay vì concept review thuần túy</h2>
+          <p>Ba trục cần cho pilot nội bộ — use case rõ, workflow có nhịp, auth/station có trust — giờ đã hiện diện trong cùng một câu chuyện.</p>
+        </div>
+        <PilotTrackGrid />
+      </section>
       <section className="hero-panel">
         <div className="hero-copy">
           <div className="eyebrow">AI PCCC PLATFORM · CHAT-FIRST WORKSPACE</div>
@@ -665,6 +826,15 @@ export function HomeScreen({ heroStats, setScreen }: { heroStats: Stat[]; setScr
           <h2>Giá trị theo vai trò vẫn rõ, nhưng đã gắn với ownership và desk logic thực tế hơn</h2>
         </div>
         <PersonaGrid items={personas} />
+      </section>
+
+      <section className="section-block">
+        <div className="section-head">
+          <span className="eyebrow">BEST-FIRST PILOT USE CASES</span>
+          <h2>Những job nên dùng để đưa bản này vào pilot nội bộ đầu tiên</h2>
+          <p>Không cố ôm quá rộng. Bản này mạnh nhất khi bám các workflow có deadline, handoff và output rõ.</p>
+        </div>
+        <UseCaseFitGrid />
       </section>
     </>
   )
@@ -814,6 +984,7 @@ export function ChatScreen({
         </div>
 
         <MetricGrid items={activeContext.metrics} />
+        <WorkflowSnapshot activeContext={activeContext} />
 
         <div className="chat-title-strip">
           <div>
@@ -859,6 +1030,11 @@ export function ChatScreen({
             <HandoffChecklist items={activeContext.handoffSteps} />
           </div>
         </div>
+
+        <div className="section-subhead">
+          <small className="sidebar-label">Workflow board</small>
+        </div>
+        <WorkflowBoard activeContext={activeContext} />
 
         <div className="section-subhead">
           <small className="sidebar-label">Suggested prompts</small>
@@ -957,6 +1133,7 @@ export function StationScreen({
 
       <BoardGrid items={syncedBoards} />
       <StatGrid stats={signals} />
+      <PilotTrackGrid />
       <AccountGrid items={accountCards} />
 
       <div className="station-main">

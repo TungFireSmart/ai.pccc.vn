@@ -25,13 +25,13 @@ function App() {
       <main className="main-shell">
         <section className="review-ribbon glass-panel">
           <div>
-            <strong>Next checkpoint · product-depth pass</strong>
-            <p>Chat management thực hơn · auth trust mạnh hơn · AI Station usable hơn. Tập trung vào cảm giác sản phẩm có thể vận hành.</p>
+            <strong>Next checkpoint · internal-pilot pass</strong>
+            <p>Thêm execution layer, pilot framing và workflow coherence để app bớt tĩnh và giống sản phẩm có thể đưa vào dùng nội bộ sớm.</p>
           </div>
           <div className="mini-tags right">
-            <span>Chat ops</span>
-            <span>Trust-first auth</span>
-            <span>Station layer</span>
+            <span>Workflow realism</span>
+            <span>Pilot-ready use cases</span>
+            <span>Trust + station</span>
           </div>
         </section>
 
