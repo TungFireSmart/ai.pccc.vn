@@ -1233,3 +1233,38 @@ button {
     grid-template-columns: 1fr;
   }
 }
+
+
+.context-bridge {
+  padding: 16px 18px;
+  border-radius: 22px;
+  margin-bottom: 18px;
+}
+
+.context-bridge p {
+  margin: 8px 0 0;
+  color: #a9bed4;
+  line-height: 1.7;
+}
+
+.context-bridge.compact {
+  margin-top: 16px;
+  margin-bottom: 0;
+}
+
+.bridge-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.bridge-actions span {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(123, 245, 231, 0.1);
+  border: 1px solid rgba(123, 245, 231, 0.18);
+  color: #dffdf9;
+  font-size: 13px;
+}

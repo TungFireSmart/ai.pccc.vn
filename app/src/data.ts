@@ -41,6 +41,32 @@ export type AuthSession = { device: string; location: string; status: string; la
 export type AccessRow = { role: string; scope: string; approval: string; seat: string }
 export type PolicyItem = { label: string; detail: string; status: string }
 
+
+export type ThreadContextPack = {
+  threadTitle: string
+  workspaceName: string
+  projectLabel: string
+  deskLabel: string
+  authStageKey: string
+  authWorkspaceHint: string
+  authTrustNote: string
+  metrics: MiniMetric[]
+  files: FileItem[]
+  outputs: string[]
+  pulse: InboxItem[]
+  activities: ActivityItem[]
+  handoffSteps: HandoffStep[]
+  messages: Message[]
+  stationBoard: WorkspaceBoard
+  stationFocus: {
+    queueLead: StationQueueItem
+    policyLead: PolicyItem
+    rosterNote: string
+    adminHeadline: string
+    reviewLabel: string
+  }
+}
+
 export const navItems: NavItem[] = [
   { key: 'home', label: 'Trang chủ' },
   { key: 'auth', label: 'Đăng nhập' },
@@ -395,4 +421,237 @@ export const policyItems: PolicyItem[] = [
   { label: 'Domain allowlist', detail: 'Chỉ email @pccc.vn và lời mời hợp lệ mới vào workspace chính.', status: 'Active' },
   { label: 'Guest project isolation', detail: 'Khách/đối tác chỉ thấy đúng project được chia sẻ, không thấy thread nội bộ khác.', status: 'Enabled' },
   { label: 'High-risk export review', detail: 'Artifact có gắn cờ đỏ phải qua owner hoặc desk lead trước khi gửi ra ngoài.', status: 'Needs owner review' },
+]
+
+
+export const threadContextPacks: ThreadContextPack[] = [
+  {
+    threadTitle: 'Rà HSMT nhà xưởng 5 tầng',
+    workspaceName: 'AI Station PCCC Vietnam',
+    projectLabel: 'Nhà xưởng Bình Dương · deadline 17:00',
+    deskLabel: 'Bid Desk',
+    authStageKey: 'login',
+    authWorkspaceHint: 'Owner quay lại đúng workspace chính để tiếp tục chuỗi duyệt HSMT, queue và artifact đang mở.',
+    authTrustNote: 'Thiết bị tin cậy có thể vào thẳng workspace nhưng vẫn thấy cảnh báo còn 1 export rủi ro cần owner duyệt.',
+    metrics: [
+      { label: 'Open threads', value: '12', note: '4 thread có deadline trong hôm nay' },
+      { label: 'Artifacts this thread', value: '04', note: 'Checklist · email · note kỹ thuật · legal summary' },
+      { label: 'Risk flags', value: '03', note: 'Thiết bị · tiến độ · năng lực nhân sự còn chờ confirm' },
+    ],
+    files: [
+      { name: 'HSMT_Nha_Xuong_Binh_Duong.pdf', kind: 'PDF · 132 trang', status: 'Primary brief' },
+      { name: 'Bang_tien_do_du_thau.xlsx', kind: 'XLSX · 6 sheet', status: 'Missing form review' },
+      { name: 'Checklist_noi_bo_biddesk.docx', kind: 'DOCX · SOP', status: 'Reference attached' },
+      { name: 'Mail_mau_phan_viec.msg', kind: 'Template', status: 'Ready for export' },
+    ],
+    outputs: [
+      'Checklist rà HSMT — 18 mục · draft v2',
+      'Email nội bộ phân việc — ready to send',
+      'Danh sách 3 rủi ro dễ thiếu — flagged',
+      'Note căn cứ áp dụng — 1 trang · needs review',
+    ],
+    pulse: [
+      { label: 'Project context', note: 'Nhà xưởng Bình Dương · deadline 17:00 · phối hợp sale + hồ sơ + kỹ thuật' },
+      { label: 'Knowledge attached', note: 'QC06, TCVN liên quan, checklist nội bộ, email template', tone: 'good' },
+      { label: 'Need review', note: 'Chờ kỹ thuật xác nhận 3 hạng mục trước khi chốt final package' },
+    ],
+    activities: [
+      { time: '10:12', title: 'Bid Desk khóa context dự án', detail: 'Thread đang dùng chung 4 file và checklist nội bộ của phòng hồ sơ.', tone: 'good' },
+      { time: '10:18', title: 'AI tạo risk flags đầu tiên', detail: 'Đánh dấu thiếu biểu mẫu tiến độ, nhân sự chủ chốt và xuất xứ thiết bị.' },
+      { time: '10:24', title: 'Technical review được yêu cầu', detail: 'Handoff sang Technical Desk để xác nhận 3 hạng mục thiết bị.', tone: 'warning' },
+      { time: '10:31', title: 'Owner visibility bật', detail: 'Thread được đẩy vào vùng theo dõi ưu tiên vì deadline còn dưới 7 giờ.' },
+    ],
+    handoffSteps: [
+      { label: 'Checklist nội bộ đã tạo', detail: '18 mục với 3 flag đỏ và deadline 17:00.', done: true },
+      { label: 'Email phân việc đã sẵn sàng', detail: 'Có bản nháp cho sale, kỹ thuật và hồ sơ.', done: true },
+      { label: 'Technical sign-off', detail: 'Còn xác nhận model thiết bị và biểu mẫu tiến độ.', done: false },
+      { label: 'Owner review trước khi export', detail: 'Đề nghị duyệt nhanh các mục risk trước khi gửi final.', done: false },
+    ],
+    messages: [
+      { role: 'assistant', meta: 'AI PCCC Copilot · Bid Desk mode · Context locked to project Nhà xưởng Bình Dương', content: 'Em đã nhận 4 file của gói thầu nhà xưởng Bình Dương. Em đang bóc nhanh theo 6 nhóm: phạm vi hệ thống, tiêu chuẩn áp dụng, thiết bị bắt buộc, hồ sơ năng lực, điều kiện thương mại và các điểm cần kỹ thuật xác nhận.' },
+      { role: 'user', meta: 'Project: Nhà xưởng Bình Dương · Deadline 17:00', content: 'Ưu tiên cho tôi checklist rà nhanh HSMT và đánh dấu các mục dễ thiếu trước deadline 17h hôm nay. Nếu được thì soạn luôn draft email phân việc cho đội hồ sơ.' },
+      { role: 'assistant', meta: 'Working draft · 18 mục · 3 risk flags · output queue synced', content: 'Em đã tạo checklist 18 mục, trong đó có 3 điểm đỏ: năng lực nhân sự, xác nhận xuất xứ thiết bị và biểu mẫu tiến độ. Em cũng đề xuất email phân việc chia cho kỹ thuật, hồ sơ và sale để chốt các phần còn thiếu trong vòng 90 phút.' },
+      { role: 'assistant', meta: 'Next actions · export + handoff available', content: 'Bước tiếp theo em có thể xuất ngay 3 output song song: checklist nộp thầu, email phân việc và note hỏi kỹ thuật. Em sẽ giữ chung context để không bị lệch giữa các bản nháp, đồng thời gắn owner cho từng output để team theo dõi dễ hơn.' },
+    ],
+    stationBoard: {
+      title: 'Thread được chọn',
+      status: 'Bid Desk · risk review đang mở',
+      summary: 'HSMT Bình Dương đang kéo theo queue kỹ thuật, owner review và kiểm tra export có gắn cờ đỏ.',
+    },
+    stationFocus: {
+      queueLead: { task: 'Duyệt note kỹ thuật cho HSMT Bình Dương', owner: 'Technical Desk', eta: '15m', status: 'Need owner visibility' },
+      policyLead: { label: 'High-risk export review', detail: 'Artifact có gắn cờ đỏ phải qua owner hoặc desk lead trước khi gửi ra ngoài.', status: 'Needs owner review' },
+      rosterNote: 'Bid Desk đang giữ nhịp chính; Technical Desk và Owner đang là hai điểm khóa tiếp theo.',
+      adminHeadline: 'Thread này kéo toàn bộ workspace sang chế độ review tốc độ cao trước deadline.',
+      reviewLabel: 'Owner review in focus',
+    },
+  },
+  {
+    threadTitle: 'Phản hồi khách hỏi tủ bơm chữa cháy',
+    workspaceName: 'AI Station PCCC Vietnam',
+    projectLabel: 'Lead nóng · cần phản hồi trong 30 phút',
+    deskLabel: 'Sales Desk',
+    authStageKey: 'invite',
+    authWorkspaceHint: 'Flow phù hợp cho Sales Lead vừa được mời vào workspace để xử lý lead mà chưa thấy toàn bộ dữ liệu admin.',
+    authTrustNote: 'Invite scope chỉ mở Sales Desk, thread khách hàng và thư viện chung; chưa thấy billing, audit hay hồ sơ nội bộ.',
+    metrics: [
+      { label: 'Reply SLA', value: '30m', note: 'Lead cần phản hồi nhanh trước khi nguội' },
+      { label: 'Missing inputs', value: '02', note: 'Tên người nhận báo giá · số điện thoại còn thiếu' },
+      { label: 'Drafts ready', value: '03', note: 'Zalo · email · checklist hỏi thêm đã chuẩn bị' },
+    ],
+    files: [
+      { name: 'Bang_gia_tu_bom_ban_le.xlsx', kind: 'XLSX · retail tier', status: 'Reference only' },
+      { name: 'Catalog_tu_bom_pccc_2026.pdf', kind: 'PDF · 48 trang', status: 'Customer-safe excerpt ready' },
+      { name: 'Lead_capture_checklist.docx', kind: 'DOCX · SOP', status: 'Phone/name validation needed' },
+    ],
+    outputs: [
+      'Draft Zalo phản hồi khách — ready to send',
+      'Checklist hỏi thêm — thiếu tên + SĐT',
+      'Brief bàn giao kỹ thuật — waiting after customer reply',
+    ],
+    pulse: [
+      { label: 'Sales context', note: 'Lead hỏi tủ bơm chữa cháy · cần giữ nhịp phản hồi trong 30 phút' },
+      { label: 'Pricing mode', note: 'Đang dùng giá bán lẻ và template hỏi thêm chuẩn', tone: 'good' },
+      { label: 'Missing contact fields', note: 'Chưa chốt tên người nhận báo giá và số điện thoại đầy đủ', tone: 'warning' },
+    ],
+    activities: [
+      { time: '11:02', title: 'Sales Desk tạo draft đầu tiên', detail: 'Tạo phản hồi ngắn để giữ lead nóng và xin đủ tên + số điện thoại.', tone: 'good' },
+      { time: '11:05', title: 'Catalog an toàn đã được rút gọn', detail: 'Chỉ giữ các trang khách cần xem, tránh lộ bảng giá nội bộ.' },
+      { time: '11:11', title: 'Need customer reply', detail: 'Thread giữ trạng thái chờ để không tạo lead khi thiếu số điện thoại.', tone: 'warning' },
+    ],
+    handoffSteps: [
+      { label: 'Draft phản hồi đã tạo', detail: 'Giữ ngắn, lịch sự và đúng giọng sale PCCC.', done: true },
+      { label: 'Xin đủ tên + SĐT', detail: 'Bắt buộc trước khi tạo lead hoặc báo giá.', done: false },
+      { label: 'Đối chiếu mã hàng trong FSales', detail: 'Kiểm tra model / nhãn hiệu ngay khi khách xác nhận.', done: false },
+    ],
+    messages: [
+      { role: 'assistant', meta: 'Sales Desk mode · lead response shell', content: 'Em đã soạn sẵn một phản hồi ngắn để giữ nhịp với khách, đồng thời xin tên và số điện thoại trước khi tạo lead hoặc gửi báo giá.' },
+      { role: 'user', meta: 'Lead nóng · khách hỏi nhanh qua Zalo', content: 'Khách đang hỏi tủ bơm chữa cháy cho nhà xưởng nhỏ. Soạn giúp tôi câu trả lời gọn và hỏi thêm thông tin cần thiết.' },
+      { role: 'assistant', meta: 'Draft ready · customer info pending', content: 'Em đề xuất trả lời: “Anh/chị cho em xin tên và số điện thoại để em gửi báo giá đúng thông tin ạ. Nếu cần, anh/chị cho em xin thêm công suất hoặc diện tích công trình để bên em tư vấn đúng model.”' },
+    ],
+    stationBoard: {
+      title: 'Thread được chọn',
+      status: 'Sales Desk · lead nóng đang chờ dữ liệu',
+      summary: 'Toàn bộ station chuyển ưu tiên sang giữ SLA phản hồi và chống tạo lead sai khi chưa đủ đầu vào.',
+    },
+    stationFocus: {
+      queueLead: { task: 'Gửi draft phản hồi lead tủ bơm', owner: 'Sales Desk', eta: '08m', status: 'Ready to ship' },
+      policyLead: { label: 'Lead data gate', detail: 'Không tạo lead khi chưa có số điện thoại và chưa đối chiếu lịch sử theo SĐT.', status: 'Enforced' },
+      rosterNote: 'Sales Desk đang dẫn nhịp; Admin chỉ vào sau khi lead đủ thông tin và cần gán quyền/phụ trách.',
+      adminHeadline: 'Luồng này cho thấy workspace biết tự siết rule dữ liệu trước khi tạo lead hay mở quyền sâu hơn.',
+      reviewLabel: 'SLA response in focus',
+    },
+  },
+  {
+    threadTitle: 'Tra cứu căn cứ thoát nạn công trình hỗn hợp',
+    workspaceName: 'AI Station PCCC Vietnam',
+    projectLabel: 'Knowledge Desk · legal summary',
+    deskLabel: 'Knowledge Desk',
+    authStageKey: 'google',
+    authWorkspaceHint: 'SSO hợp với chuyên gia nội bộ vào nhanh để tra cứu, rà nguồn và publish note dưới đúng workspace/domain.',
+    authTrustNote: 'Domain @pccc.vn khớp nên vào nhanh, nhưng publish ra thư viện chung vẫn giữ bước peer review.',
+    metrics: [
+      { label: 'Sources attached', value: '05', note: 'QC06 · TCVN · note nội bộ và 2 trích dẫn liên quan' },
+      { label: 'Peer review', value: '01', note: 'Còn 1 lượt kiểm tra chéo trước khi publish' },
+      { label: 'Output size', value: '1 trang', note: 'Tóm tắt để sale và kỹ thuật cùng dùng được' },
+    ],
+    files: [
+      { name: 'QC06_2022_BXD.pdf', kind: 'PDF · quy chuẩn', status: 'Primary source' },
+      { name: 'TCVN_thoat_nan_mixuse.pdf', kind: 'PDF · excerpt', status: 'Cross-check required' },
+      { name: 'Legal_summary_mixuse.md', kind: 'Note · 1 page', status: 'Ready for peer review' },
+    ],
+    outputs: [
+      'Legal summary — 1 trang · ready to export',
+      'Danh sách điểm dễ nhầm — internal only',
+      'Note kiểm tra chéo — peer review pending',
+    ],
+    pulse: [
+      { label: 'Knowledge context', note: 'Tra cứu thoát nạn cho công trình hỗn hợp, chuẩn bị note 1 trang cho team dùng chung' },
+      { label: 'Source hygiene', note: 'Đã gắn nguồn và phân biệt rõ excerpt với diễn giải nội bộ', tone: 'good' },
+      { label: 'Publish gate', note: 'Cần một lượt peer review trước khi đưa vào library chung' },
+    ],
+    activities: [
+      { time: '09:40', title: 'Knowledge Desk gom nguồn', detail: 'Khóa 5 nguồn liên quan và tách nội dung có thể trích dẫn.', tone: 'good' },
+      { time: '09:56', title: 'AI rút note 1 trang', detail: 'Biến căn cứ dài thành phiên bản sale/kỹ thuật dễ tiêu hóa.' },
+      { time: '10:07', title: 'Peer review được bật', detail: 'Giữ publish ở trạng thái chờ để tránh sai viện dẫn.', tone: 'warning' },
+    ],
+    handoffSteps: [
+      { label: 'Nguồn gốc viện dẫn đã gắn', detail: 'Mỗi trích dẫn đều nối về file gốc.', done: true },
+      { label: 'Note 1 trang đã tạo', detail: 'Dùng được cho sale và kỹ thuật.', done: true },
+      { label: 'Peer review', detail: 'Cần kiểm tra chéo trước khi publish vào workspace library.', done: false },
+    ],
+    messages: [
+      { role: 'assistant', meta: 'Knowledge Desk mode · legal synthesis', content: 'Em đã gom các căn cứ liên quan đến thoát nạn cho công trình hỗn hợp và rút thành note 1 trang để sale, kỹ thuật và hồ sơ cùng dùng chung.' },
+      { role: 'user', meta: 'Need legal clarity', content: 'Tôi cần bản tóm tắt gọn, có nguồn, và chỉ ra những chỗ team hay hiểu sai khi tư vấn cho công trình hỗn hợp.' },
+      { role: 'assistant', meta: 'Ready to export · peer review pending', content: 'Em đã chia phần căn cứ bắt buộc, phần dễ nhầm và phần cần kiểm tra chéo. Nếu anh muốn, em có thể xuất thêm một bản “không jargon” để sale dùng trực tiếp.' },
+    ],
+    stationBoard: {
+      title: 'Thread được chọn',
+      status: 'Knowledge Desk · publish gate đang mở',
+      summary: 'Station chuyển trọng tâm sang source hygiene, review trước publish và tái sử dụng tri thức cho toàn workspace.',
+    },
+    stationFocus: {
+      queueLead: { task: 'Peer review note thoát nạn công trình hỗn hợp', owner: 'Knowledge Desk', eta: '20m', status: 'Ready for review' },
+      policyLead: { label: 'Library publish review', detail: 'Note pháp lý trước khi vào thư viện chung phải có ít nhất 1 lượt kiểm tra chéo nguồn.', status: 'Enabled' },
+      rosterNote: 'Knowledge Desk là điểm chính; Sales và Technical là người dùng downstream của output này.',
+      adminHeadline: 'Luồng này làm AI Station trông như một knowledge engine có kiểm soát nguồn chứ không chỉ là chat đẹp.',
+      reviewLabel: 'Knowledge publish in focus',
+    },
+  },
+  {
+    threadTitle: 'Onboarding kỹ sư mới vào thư viện nội bộ',
+    workspaceName: 'AI Station PCCC Vietnam',
+    projectLabel: 'Admin Desk · onboarding nội bộ',
+    deskLabel: 'Admin Desk',
+    authStageKey: 'signup',
+    authWorkspaceHint: 'Phù hợp cho người mới vào team: tạo tài khoản, gán desk, cấp scope thư viện và cho thấy họ không bị thả vào workspace một cách mù mờ.',
+    authTrustNote: 'Workspace setup làm rõ owner, desk được vào, thư viện được thấy và các bước approval nếu quyền vượt chuẩn.',
+    metrics: [
+      { label: 'Onboarding assets', value: '06', note: 'FAQ · SOP · checklist tuần đầu · policy read list' },
+      { label: 'Access scopes', value: '03', note: 'Technical Desk · shared library · assigned projects' },
+      { label: 'Pending approvals', value: '01', note: 'Chờ admin chốt quyền nếu cần scope rộng hơn' },
+    ],
+    files: [
+      { name: 'FAQ_onboarding_ky_su.md', kind: 'Markdown · internal', status: 'Needs rename polish' },
+      { name: 'SOP_thu_vien_noi_bo.pdf', kind: 'PDF · internal', status: 'Required reading' },
+      { name: 'Checklist_tuan_dau.docx', kind: 'DOCX · onboarding', status: 'Ready to assign' },
+    ],
+    outputs: [
+      'FAQ onboarding — draft v1',
+      'Checklist tuần đầu — ready',
+      'Scope access note — admin review pending',
+    ],
+    pulse: [
+      { label: 'Onboarding context', note: 'Chuẩn hóa cách kỹ sư mới vào workspace, đọc SOP và thấy đúng thư viện được cấp' },
+      { label: 'Library access', note: 'Chỉ mở shared technical library và project được gán', tone: 'good' },
+      { label: 'Permission change', note: 'Nếu đổi từ Technical sang Admin, luồng sẽ giữ ở trạng thái chờ duyệt', tone: 'warning' },
+    ],
+    activities: [
+      { time: '08:55', title: 'Admin Desk gom tài liệu onboarding', detail: 'Tách FAQ, SOP và checklist tuần đầu thành bộ đầu vào rõ ràng.', tone: 'good' },
+      { time: '09:12', title: 'AI đề xuất rename sạch hơn', detail: 'Gợi ý chuẩn hóa tên FAQ và gắn source cho thư viện.' },
+      { time: '09:28', title: 'Access scope đang chờ duyệt', detail: 'Chưa mở quyền admin hay toàn workspace cho user mới.', tone: 'warning' },
+    ],
+    handoffSteps: [
+      { label: 'FAQ onboarding đã tạo', detail: 'Bao phủ tuần đầu, SOP cần đọc và nơi hỏi support.', done: true },
+      { label: 'Checklist tuần đầu sẵn sàng', detail: 'Dùng để mentor theo dõi tiến độ.', done: true },
+      { label: 'Admin approval nếu mở rộng quyền', detail: 'Giữ workspace an toàn khi tăng scope ngoài chuẩn Technical Desk.', done: false },
+    ],
+    messages: [
+      { role: 'assistant', meta: 'Admin Desk mode · onboarding shell', content: 'Em đang dựng bộ onboarding cho kỹ sư mới để họ vào đúng Technical Desk, thấy đúng thư viện và biết phải đọc SOP nào trong tuần đầu.' },
+      { role: 'user', meta: 'Need structured onboarding', content: 'Giúp tôi biến tài liệu rời rạc thành gói onboarding rõ ràng cho kỹ sư mới, có FAQ và checklist tuần đầu.' },
+      { role: 'assistant', meta: 'Workspace setup + access cues', content: 'Em đã gom được FAQ, checklist tuần đầu và note scope truy cập. Nếu anh muốn mở quyền rộng hơn Technical Desk, em sẽ gắn thêm bước admin approval để không lỏng quyền.' },
+    ],
+    stationBoard: {
+      title: 'Thread được chọn',
+      status: 'Admin Desk · onboarding controls',
+      summary: 'Toàn station nghiêng sang setup workspace, seat logic, invite scope và library access cho user mới.',
+    },
+    stationFocus: {
+      queueLead: { task: 'Rà role guest cho đối tác hồ sơ', owner: 'Admin Desk', eta: 'Today', status: 'Pending approval' },
+      policyLead: { label: 'Role elevation approval', detail: 'Mọi thay đổi từ scope desk chuẩn sang admin hoặc toàn workspace đều phải qua duyệt.', status: 'Active' },
+      rosterNote: 'Admin Desk đang dẫn kịch bản; Technical Desk là người nhận onboarding sau khi scope được chốt.',
+      adminHeadline: 'Thread này khiến auth, workspace và station nhập vào cùng một câu chuyện cấp quyền thực tế.',
+      reviewLabel: 'Onboarding controls in focus',
+    },
+  },
 ]

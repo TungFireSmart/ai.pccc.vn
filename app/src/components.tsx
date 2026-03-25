@@ -23,6 +23,7 @@ import type {
   TeamMember,
   WorkspaceBoard,
   ChatThread,
+  ThreadContextPack,
 } from './data'
 import {
   accessMatrix,
@@ -32,10 +33,6 @@ import {
   authSessions,
   authStages,
   authTrustItems,
-  activeThreadFiles,
-  chatMessages,
-  chatMetrics,
-  chatSideOutputs,
   chatThreads,
   conversationStates,
   personas,
@@ -47,9 +44,6 @@ import {
   stationRoster,
   stationTimeline,
   suggestedPrompts,
-  threadActivities,
-  threadHandoffSteps,
-  workspacePulse,
 } from './data'
 
 export function TopNav({
@@ -676,8 +670,15 @@ export function HomeScreen({ heroStats, setScreen }: { heroStats: Stat[]; setScr
   )
 }
 
-export function AuthScreen() {
-  const [activeAuth, setActiveAuth] = useState('login')
+export function AuthScreen({
+  activeContext,
+  activeAuth,
+  setActiveAuth,
+}: {
+  activeContext: ThreadContextPack
+  activeAuth: string
+  setActiveAuth: (value: string) => void
+}) {
   const activeStage = useMemo(() => authStages.find((item) => item.key === activeAuth) ?? authStages[0], [activeAuth])
 
   return (
@@ -690,6 +691,17 @@ export function AuthScreen() {
             Màn này cho thấy các trạng thái quan trọng nhất của một sản phẩm B2B: quay lại workspace, tạo mới, vào bằng Google,
             khôi phục truy cập, chấp nhận lời mời và hiểu ngay mình đang đi vào phạm vi nào.
           </p>
+        </div>
+
+        <div className="context-bridge glass-panel">
+          <small className="sidebar-label">Workspace-aware auth bridge</small>
+          <strong>{activeContext.workspaceName}</strong>
+          <p>{activeContext.authWorkspaceHint}</p>
+          <div className="mini-tags stack">
+            <span>{activeContext.projectLabel}</span>
+            <span>{activeContext.deskLabel}</span>
+            <span>{activeContext.stationFocus.reviewLabel}</span>
+          </div>
         </div>
 
         <AuthTabs items={authStages} active={activeAuth} setActive={setActiveAuth} />
@@ -705,6 +717,11 @@ export function AuthScreen() {
 
         <FlowGrid items={authFlowSteps} />
         <TrustList items={authTrustItems} />
+
+        <div className="context-bridge compact glass-panel">
+          <small className="sidebar-label">Trust note for current workspace state</small>
+          <p>{activeContext.authTrustNote}</p>
+        </div>
 
         <div className="section-subhead">
           <small className="sidebar-label">Session center</small>
@@ -727,8 +744,17 @@ export function AuthScreen() {
   )
 }
 
-export function ChatScreen() {
-  const [activeThread, setActiveThread] = useState(chatThreads.find((item) => item.active)?.title ?? chatThreads[0].title)
+export function ChatScreen({
+  activeThread,
+  setActiveThread,
+  activeContext,
+  setActiveAuth,
+}: {
+  activeThread: string
+  setActiveThread: (value: string) => void
+  activeContext: ThreadContextPack
+  setActiveAuth: (value: string) => void
+}) {
   const [composerMode, setComposerMode] = useState<'Ask' | 'Draft' | 'Extract' | 'Assign'>('Draft')
   const currentThread = useMemo(() => chatThreads.find((item) => item.title === activeThread) ?? chatThreads[0], [activeThread])
   const threadHealth = currentThread.priority === 'Critical' ? 'Owner visibility recommended' : currentThread.priority === 'High' ? 'Desk lead should monitor' : 'Routine handling is enough'
@@ -752,7 +778,7 @@ export function ChatScreen() {
             <small className="sidebar-label">Conversation list</small>
             <span>12 threads</span>
           </div>
-          <ThreadList items={chatThreads} activeTitle={activeThread} onSelect={setActiveThread} />
+          <ThreadList items={chatThreads} activeTitle={activeThread} onSelect={(value) => { setActiveThread(value); }} />
         </div>
 
         <div className="sidebar-section compact-gap">
@@ -770,14 +796,24 @@ export function ChatScreen() {
             <h2>Khung chat quen thuộc, nhưng đã có owner, SLA, file stack, priority và output handoff như một công cụ làm việc thật</h2>
           </div>
           <div className="header-tags">
-            <span>Hồ sơ thầu</span>
-            <span>Nhà xưởng Bình Dương</span>
+            <span>{activeContext.deskLabel}</span>
+            <span>{activeContext.projectLabel}</span>
             <span>{currentThread.owner}</span>
             <span>{currentThread.priority}</span>
           </div>
         </div>
 
-        <MetricGrid items={chatMetrics} />
+        <div className="context-bridge glass-panel">
+          <small className="sidebar-label">Live workspace sync</small>
+          <strong>{activeContext.workspaceName}</strong>
+          <p>Chọn thread nào thì metrics, file stack, output rail, workspace pulse, AI Station focus và auth entry context đều đổi theo thread đó.</p>
+          <div className="bridge-actions">
+            <button className="secondary-btn slim" onClick={() => setActiveAuth(activeContext.authStageKey)}>Sync auth state</button>
+            <span>{activeContext.stationFocus.reviewLabel}</span>
+          </div>
+        </div>
+
+        <MetricGrid items={activeContext.metrics} />
 
         <div className="chat-title-strip">
           <div>
@@ -807,20 +843,20 @@ export function ChatScreen() {
           </div>
         </div>
 
-        <MessageList items={chatMessages} />
+        <MessageList items={activeContext.messages} />
 
         <div className="chat-detail-grid">
           <div>
             <div className="section-subhead">
               <small className="sidebar-label">Artifacts & source files</small>
             </div>
-            <FileList items={activeThreadFiles} />
+            <FileList items={activeContext.files} />
           </div>
           <div>
             <div className="section-subhead">
               <small className="sidebar-label">Handoff checklist</small>
             </div>
-            <HandoffChecklist items={threadHandoffSteps} />
+            <HandoffChecklist items={activeContext.handoffSteps} />
           </div>
         </div>
 
@@ -858,30 +894,45 @@ export function ChatScreen() {
         </div>
         <div className="side-block">
           <small className="sidebar-label">Workspace pulse</small>
-          <InboxList items={workspacePulse} />
+          <InboxList items={activeContext.pulse} />
         </div>
         <div className="side-block">
           <small className="sidebar-label">Output rail</small>
           <div className="mini-tags stack">
-            {chatSideOutputs.map((item) => (
+            {activeContext.outputs.map((item) => (
               <span key={item}>{item}</span>
             ))}
           </div>
         </div>
         <div className="side-block">
           <small className="sidebar-label">Activity rail</small>
-          <ActivityList items={threadActivities} />
+          <ActivityList items={activeContext.activities} />
         </div>
         <div className="side-block emphasis">
           <small className="sidebar-label">Thread controls</small>
-          <p>Cho thấy hướng sản phẩm: assign owner, track unread, export artifact, archive xong việc, giữ decision trail và buộc handoff rõ theo từng thread.</p>
+          <p>{activeContext.stationFocus.adminHeadline}</p>
         </div>
       </aside>
     </section>
   )
 }
 
-export function StationScreen({ signals }: { signals: Stat[] }) {
+export function StationScreen({
+  signals,
+  activeContext,
+  setActiveThread,
+  setScreen,
+  setActiveAuth,
+}: {
+  signals: Stat[]
+  activeContext: ThreadContextPack
+  setActiveThread: (value: string) => void
+  setScreen: (screen: Screen) => void
+  setActiveAuth: (value: string) => void
+}) {
+  const syncedBoards = [activeContext.stationBoard, ...stationBoards.slice(0, 2)]
+  const syncedQueue = [activeContext.stationFocus.queueLead, ...stationQueue.filter((item) => item.task !== activeContext.stationFocus.queueLead.task).slice(0, 3)]
+  const syncedPolicies = [activeContext.stationFocus.policyLead, ...policyItems.filter((item) => item.label !== activeContext.stationFocus.policyLead.label).slice(0, 2)]
   return (
     <section className="station-layout">
       <div className="section-head left">
@@ -893,7 +944,18 @@ export function StationScreen({ signals }: { signals: Stat[] }) {
         </p>
       </div>
 
-      <BoardGrid items={stationBoards} />
+      <div className="context-bridge glass-panel">
+        <small className="sidebar-label">Station synced with selected thread</small>
+        <strong>{activeContext.threadTitle}</strong>
+        <p>{activeContext.stationFocus.adminHeadline}</p>
+        <div className="bridge-actions">
+          <button className="secondary-btn slim" onClick={() => { setScreen('chat'); setActiveThread(activeContext.threadTitle) }}>Open this thread</button>
+          <button className="secondary-btn slim" onClick={() => { setScreen('auth'); setActiveAuth(activeContext.authStageKey) }}>Open auth state</button>
+          <span>{activeContext.stationFocus.reviewLabel}</span>
+        </div>
+      </div>
+
+      <BoardGrid items={syncedBoards} />
       <StatGrid stats={signals} />
       <AccountGrid items={accountCards} />
 
@@ -904,6 +966,11 @@ export function StationScreen({ signals }: { signals: Stat[] }) {
             <span>Thiết kế để sau này cắm member thật, role thật, quota, project access, audit trail và handoff logic.</span>
           </div>
           <StationCardGrid items={stationCards} />
+
+          <div className="context-bridge compact glass-panel">
+            <small className="sidebar-label">Roster note</small>
+            <p>{activeContext.stationFocus.rosterNote}</p>
+          </div>
 
           <div className="section-subhead roomy">
             <small className="sidebar-label">Team roster</small>
@@ -930,18 +997,17 @@ export function StationScreen({ signals }: { signals: Stat[] }) {
           <div className="section-subhead roomy">
             <small className="sidebar-label">Handoff queue</small>
           </div>
-          <QueueList items={stationQueue} />
+          <QueueList items={syncedQueue} />
 
           <div className="section-subhead roomy">
             <small className="sidebar-label">Policy center</small>
           </div>
-          <PolicyList items={policyItems} />
+          <PolicyList items={syncedPolicies} />
 
           <div className="side-block emphasis">
             <small className="sidebar-label">Admin direction</small>
             <p>
-              Station này đã đủ sức kể đường productization: owner center, trusted entry, desk-based workspace,
-              shared library, queue visibility, audit summary, role matrix và billing ownership trong cùng một narrative.
+              {activeContext.stationFocus.adminHeadline}
             </p>
           </div>
         </div>

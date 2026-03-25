@@ -1,10 +1,13 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import './App.css'
-import { heroStats, navItems, stationSignals, type Screen } from './data'
+import { heroStats, navItems, stationSignals, threadContextPacks, type Screen } from './data'
 import { AuthScreen, ChatScreen, HomeScreen, StationScreen, TopNav } from './components'
 
 function App() {
   const [screen, setScreen] = useState<Screen>('home')
+  const [activeThread, setActiveThread] = useState(threadContextPacks[0].threadTitle)
+  const [activeAuth, setActiveAuth] = useState(threadContextPacks[0].authStageKey)
+  const activeContext = useMemo(() => threadContextPacks.find((item) => item.threadTitle === activeThread) ?? threadContextPacks[0], [activeThread])
 
   return (
     <div className="app-shell">
@@ -33,9 +36,9 @@ function App() {
         </section>
 
         {screen === 'home' && <HomeScreen heroStats={heroStats} setScreen={setScreen} />}
-        {screen === 'auth' && <AuthScreen />}
-        {screen === 'chat' && <ChatScreen />}
-        {screen === 'station' && <StationScreen signals={stationSignals} />}
+        {screen === 'auth' && <AuthScreen activeContext={activeContext} activeAuth={activeAuth} setActiveAuth={setActiveAuth} />}
+        {screen === 'chat' && <ChatScreen activeThread={activeThread} setActiveThread={setActiveThread} activeContext={activeContext} setActiveAuth={setActiveAuth} />}
+        {screen === 'station' && <StationScreen signals={stationSignals} activeContext={activeContext} setActiveThread={setActiveThread} setScreen={setScreen} setActiveAuth={setActiveAuth} />}
       </main>
     </div>
   )
