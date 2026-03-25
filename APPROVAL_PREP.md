@@ -7,9 +7,10 @@
 Milestone 3 hiện đã được khóa ở mốc **freeze-for-review** để owner có thể xem và quyết định ngay.
 
 ## Những gì đã được tăng cường ở vòng này
-- Làm rõ narrative “pre-approval build” ở home / enterprise
-- Làm workspace thuyết phục hơn bằng cách cho mỗi agent một scenario riêng
-- Khi đổi agent, phần mode / context / next step / prompts / outputs thay đổi theo đúng loại việc
+- Làm rõ narrative “pre-approval build” ở Home và toàn bộ review path
+- Thêm role-aware landing, stage navigation và decision pulse để người duyệt không bị lạc mạch
+- Làm Chat app thuyết phục hơn bằng thread ownership, approval rail, export rail và continuity giữa các desk
+- Làm Auth và AI Station đáng tin hơn bằng trust signals, access framing, queue và policy center
 - Giảm cảm giác demo tĩnh, tăng cảm giác hệ thống có chiều sâu workflow
 
 ## Approval questions cần owner trả lời

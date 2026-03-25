@@ -9,17 +9,19 @@ Bản hiện tại nhằm giúp owner đánh giá:
 - có thể chốt luôn hướng tiếp theo mà không cần thêm một vòng polish demo nữa không
 
 ## Cách review đề xuất
-1. Mở Home để xem định vị, use cases, output previews và decision strip
-2. Vào Workspace để cảm nhận trải nghiệm lõi
-3. Vào Enterprise để xem đường mở rộng và owner decision panel
-4. Chỉ sau đó mới lướt qua Agents / Tools / Library để kiểm tra độ rộng nền tảng
+1. Mở **Home** để xem định vị, role-aware landing, use cases và decision framing
+2. Vào **Auth** để kiểm tra câu chuyện vào đúng workspace, đúng quyền, đúng mức tin cậy
+3. Vào **Chat app** để cảm nhận thread ownership, approval rail, export rail và continuity giữa các desk
+4. Vào **AI Station** để xem queue, policy, access framing và admin orchestration
+
+> Đây là thứ tự review tốt nhất cho bản hiện tại. Nó bám đúng mạch: vào sản phẩm → vào workspace → làm việc → điều phối.
 
 ## Những điểm cần owner chú ý khi duyệt
 - Cảm giác tổng thể có đủ “hàng đầu” chưa?
 - Ngôn ngữ và định vị có đúng ngành PCCC Việt Nam chưa?
-- Giao diện workspace có khiến muốn dùng thật không?
-- Các agent đã hợp lý chưa, thiếu vai trò nào không?
-- Thư viện tri thức và enterprise layer có đủ tiềm năng mở rộng không?
+- Auth / entry có đủ đáng tin để nhìn ra đường SaaS B2B thật không?
+- Chat thread có khiến muốn dùng thật không, hay vẫn còn cảm giác demo?
+- AI Station có đủ logic điều phối để thấy đường productize sau duyệt không?
 
 ## Hạng mục còn tiếp tục polish
 - tăng chiều sâu interaction

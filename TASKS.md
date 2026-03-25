@@ -27,6 +27,14 @@
    - Home / workspace / tools / library / enterprise đã có độ hoàn thiện và hierarchy thuyết phục hơn.
    - Bộ tài liệu review đã đủ để owner mở xem và phản hồi định hướng ngay.
 
+## Current closeout checklist (owner-requested)
+1. [x] Cắt nốt copy còn dài trên web
+2. [x] Đồng nhất label / trạng thái còn lẫn Anh–Việt
+3. [x] Siết state/status để đọc lướt nhanh
+4. [x] Rút gọn hero / review strip / action text
+5. [x] Đồng bộ snapshot/tasks/docs với trạng thái thật hiện tại
+6. [x] Build và khóa lại bản Phase 1
+
 ## Quality bar
 - Trông như sản phẩm thật, không như template demo
 - Copywriting rõ, ngắn, sang

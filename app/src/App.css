@@ -273,6 +273,8 @@ button {
   align-items: center;
   margin-bottom: 28px;
   padding: 18px 20px;
+  border-color: rgba(123, 245, 231, 0.16);
+  background: linear-gradient(135deg, rgba(123, 245, 231, 0.08), rgba(120, 169, 255, 0.08));
 }
 
 .review-ribbon strong,
@@ -1282,7 +1284,8 @@ button {
   .pilot-track-grid,
   .usecase-fit-grid,
   .workflow-snapshot-grid,
-  .workflow-board {
+  .workflow-board,
+  .decision-pulse-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1373,7 +1376,8 @@ button {
   font-size: 13px;
 }
 
-.role-mode-switch {
+.role-mode-switch,
+.decision-pulse {
   display: grid;
   gap: 16px;
   margin-bottom: 28px;
@@ -1381,9 +1385,11 @@ button {
 }
 
 .role-mode-switch p,
+.decision-pulse p,
 .approval-step p,
 .export-card p,
 .role-mode-switch strong,
+.decision-pulse strong,
 .approval-step strong,
 .export-card strong,
 .approval-step small,
@@ -1391,6 +1397,38 @@ button {
 .approval-step-head span,
 .mode-pill {
   color: #edf4ff;
+}
+
+.decision-pulse-copy p {
+  margin: 8px 0 0;
+  max-width: 78ch;
+  line-height: 1.75;
+  color: #a9bed4;
+}
+
+.decision-pulse-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1.05fr 0.95fr;
+}
+
+.decision-pulse-card {
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.03));
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.28);
+}
+
+.decision-pulse-card.emphasis {
+  background: linear-gradient(135deg, rgba(123, 245, 231, 0.14), rgba(120, 169, 255, 0.14));
+  border-color: rgba(123, 245, 231, 0.26);
+}
+
+.decision-pulse-card p {
+  margin: 8px 0 0;
+  line-height: 1.7;
+  color: #a9bed4;
 }
 
 .mode-pill-row,

@@ -6,19 +6,17 @@
 
 ## Demo path
 1. Home
-   - Nhấn mạnh định vị, độ khác biệt, và câu hỏi: đây có đủ là một sản phẩm AI chuyên ngành thật chưa?
-2. Workspace
-   - Chọn lần lượt 3 agent khác nhau
-   - Quan sát mode / context / next step / prompts / outputs đổi theo workflow
-   - Nhấn mạnh đây không phải một khung chat tĩnh mà là workspace theo vai trò
-3. Agents
-   - Cho thấy mỗi vai trò AI phục vụ một nhóm công việc rõ ràng
-4. Tools
-   - Cho thấy platform không chỉ chat, mà là tool workspace
-5. Library
-   - Nhấn mạnh moat dữ liệu và tri thức doanh nghiệp
-6. Enterprise
-   - Nhấn mạnh tiềm năng go-live và scale sau duyệt
+   - Nhấn mạnh định vị, độ khác biệt, role-aware landing và decision framing
+   - Câu hỏi chính: đây đã đủ là một sản phẩm AI chuyên ngành thật chưa?
+2. Auth
+   - Cho thấy câu chuyện vào đúng workspace, đúng quyền, đúng mức tin cậy
+   - Nhấn mạnh đây không chỉ là form đăng nhập đẹp mà là workspace entry của một SaaS B2B
+3. Chat app
+   - Đổi thread / stage để xem mode, context, next action, approval rail và export rail thay đổi ra sao
+   - Nhấn mạnh đây không phải khung chat tĩnh mà là thread làm việc có ownership và continuity
+4. AI Station
+   - Cho thấy queue, policy, access framing và admin orchestration
+   - Nhấn mạnh đây là tầng điều phối đủ đáng tin để nhìn ra đường productize sau duyệt
 
 ## Key narrative
 - Không phải website giới thiệu AI chung chung

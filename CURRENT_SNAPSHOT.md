@@ -5,11 +5,11 @@ Milestone 3 — **Pre-approval candidate (next checkpoint depth pass)**
 
 ## Current status
 - Milestone 2 đã hoàn tất cho review nội bộ
-- Milestone 3 vẫn giữ hướng **decision-ready**, nhưng app đã được đẩy thêm một checkpoint sâu hơn thay vì chỉ đứng ở freeze copy
+- Milestone 3 đang ở mốc **decision-ready**
 - Frontend build đang pass ổn định
-- Narrative, walkthrough, approval-prep, và go-live-after-approval docs đã có
-- App hiện đã có review-quickbar, pre-approval check deck, decision strip, owner decision panel, after-approval roadmap block, cùng lớp interaction mới cho chat/auth/station
-- Checkpoint mới nhất đã thêm interactive stage navigator, live flow panel và role-to-role transition rail để review → approve → export/share và continuity giữa các desk nhìn sống hơn thay vì chỉ là copy mô tả
+- Bộ tài liệu review đã có và đã sync lại theo đúng 4 màn hiện tại: Home → Auth → Chat app → AI Station
+- App hiện đã có stage navigator, live flow, transition rail và decision pulse
+- Vòng polish mới nhất đang siết mạnh theo hướng: **chữ ngắn, dễ lướt, đồng đều trên toàn site**
 
 ## Những gì mạnh nhất lúc này
 - Định vị AI chuyên ngành PCCC đã rõ
@@ -21,7 +21,15 @@ Milestone 3 — **Pre-approval candidate (next checkpoint depth pass)**
 ## Những gì còn có thể tiếp tục tăng lực
 - polish thêm interaction depth nếu cần
 - tăng thêm dữ liệu mẫu đậm PCCC hơn
-- làm thêm visual/screenshot custom nếu muốn nâng cảm giác premium ở vòng sau
+- làm thêm visual/screenshot custom ở vòng sau
+
+## Closeout checklist đang chạy
+1. Cắt nốt copy còn dài trên web
+2. Đồng nhất label / trạng thái
+3. Siết state/status để đọc lướt nhanh
+4. Rút hero / review strip / action text
+5. Sync snapshot/tasks/docs
+6. Build và khóa lại bản Phase 1
 
 ## Nếu dừng tại đây để xin duyệt
 Bản hiện tại đã đủ để hỏi câu quan trọng nhất:
