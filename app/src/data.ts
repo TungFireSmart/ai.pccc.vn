@@ -1,6 +1,7 @@
 export type Screen = 'home' | 'auth' | 'chat' | 'station'
 export type WorkspaceModeKey = 'owner' | 'sales' | 'technical' | 'bid' | 'knowledge'
 export type ExportState = 'Draft' | 'Needs approval' | 'Approved' | 'Ready to share'
+export type FlowStageKey = 'review' | 'approve' | 'export' | 'share'
 
 export type NavItem = { key: Screen; label: string }
 export type Feature = { title: string; description: string }
@@ -53,6 +54,20 @@ export type WorkspaceMode = {
   canApprove: string
   focus: string[]
 }
+export type FlowStage = {
+  key: FlowStageKey
+  label: string
+  owner: string
+  status: 'Live' | 'Next' | 'Queued'
+  detail: string
+}
+export type TransitionMoment = {
+  from: string
+  to: string
+  eta: string
+  status: 'Active' | 'Queued' | 'Ready'
+  note: string
+}
 
 export type ThreadContextPack = {
   threadTitle: string
@@ -73,6 +88,8 @@ export type ThreadContextPack = {
   approvalSteps: ApprovalStep[]
   exportArtifacts: ExportArtifact[]
   messages: Message[]
+  stageFlow: FlowStage[]
+  transitionMoments: TransitionMoment[]
   stationBoard: WorkspaceBoard
   stationFocus: {
     queueLead: StationQueueItem
@@ -485,6 +502,17 @@ export const threadContextPacks: ThreadContextPack[] = [
       { role: 'assistant', meta: 'Working draft · 18 mục · 3 risk flags · output queue synced', content: 'Em đã tạo checklist 18 mục, trong đó có 3 điểm đỏ: năng lực nhân sự, xác nhận xuất xứ thiết bị và biểu mẫu tiến độ. Em cũng đề xuất email phân việc chia cho kỹ thuật, hồ sơ và sale để chốt các phần còn thiếu trong vòng 90 phút.' },
       { role: 'assistant', meta: 'Next actions · export + handoff available', content: 'Bước tiếp theo em có thể xuất ngay 3 output song song: checklist nộp thầu, email phân việc và note hỏi kỹ thuật. Em sẽ giữ chung context để không bị lệch giữa các bản nháp, đồng thời gắn owner cho từng output để team theo dõi dễ hơn.' },
     ],
+    stageFlow: [
+      { key: 'review', label: 'Review package', owner: 'Bid Desk', status: 'Live', detail: 'Checklist, risk flags và package nội bộ đang được gom thành một gói review duy nhất.' },
+      { key: 'approve', label: 'Technical + owner approve', owner: 'Technical Desk · Tùng', status: 'Next', detail: 'Kỹ thuật chốt model, sau đó owner mở release cho package đỏ.' },
+      { key: 'export', label: 'Export nội bộ', owner: 'Bid Desk', status: 'Queued', detail: 'Xuất checklist PDF và email phân việc đồng bộ cùng project context.' },
+      { key: 'share', label: 'Desk handoff confirmed', owner: 'Bid + Technical', status: 'Queued', detail: 'Khi package đi xong, thread chuyển về chế độ theo dõi hoàn tất và giữ continuity cho deadline.' },
+    ],
+    transitionMoments: [
+      { from: 'Bid Desk', to: 'Technical Desk', eta: 'Ngay', status: 'Active', note: 'Đẩy note hỏi model và form tiến độ để kỹ thuật sign-off trong cùng thread.' },
+      { from: 'Technical Desk', to: 'Owner', eta: '15m', status: 'Queued', note: 'Chỉ đưa owner những điểm đỏ đã được kỹ thuật gói gọn, tránh ép owner đọc lại toàn bộ hồ sơ.' },
+      { from: 'Owner', to: 'Bid Desk', eta: '20m', status: 'Ready', note: 'Sau duyệt, Bid Desk nhận lại package với trạng thái export-safe để gửi nội bộ ngay.' },
+    ],
     stationBoard: {
       title: 'Thread được chọn',
       status: 'Bid Desk · risk review đang mở',
@@ -552,6 +580,17 @@ export const threadContextPacks: ThreadContextPack[] = [
       { role: 'assistant', meta: 'Sales Desk mode · lead response shell', content: 'Em đã soạn sẵn một phản hồi ngắn để giữ nhịp với khách, đồng thời xin tên và số điện thoại trước khi tạo lead hoặc gửi báo giá.' },
       { role: 'user', meta: 'Lead nóng · khách hỏi nhanh qua Zalo', content: 'Khách đang hỏi tủ bơm chữa cháy cho nhà xưởng nhỏ. Soạn giúp tôi câu trả lời gọn và hỏi thêm thông tin cần thiết.' },
       { role: 'assistant', meta: 'Draft ready · customer info pending', content: 'Em đề xuất trả lời: “Anh/chị cho em xin tên và số điện thoại để em gửi báo giá đúng thông tin ạ. Nếu cần, anh/chị cho em xin thêm công suất hoặc diện tích công trình để bên em tư vấn đúng model.”' },
+    ],
+    stageFlow: [
+      { key: 'review', label: 'Sales review', owner: 'Sales Desk', status: 'Live', detail: 'Kiểm tra câu trả lời ngắn, an toàn và chưa lộ giá nội bộ.' },
+      { key: 'approve', label: 'Data gate approve', owner: 'Sales Desk', status: 'Next', detail: 'Chỉ khi đủ tên và SĐT thì thread mới mở sang lead brief hoặc báo giá.' },
+      { key: 'export', label: 'Send customer-safe reply', owner: 'Sales Desk', status: 'Queued', detail: 'Gửi Zalo reply và excerpt catalog đã lọc cho khách.' },
+      { key: 'share', label: 'Technical handoff if needed', owner: 'Sales + Technical', status: 'Queued', detail: 'Nếu khách phản hồi đủ scope, brief sẽ đi tiếp sang Technical Desk ngay trong thread này.' },
+    ],
+    transitionMoments: [
+      { from: 'Sales Desk', to: 'Customer', eta: '08m', status: 'Active', note: 'Giữ lead nóng bằng một reply ngắn, lịch sự và có checkpoint dữ liệu rõ.' },
+      { from: 'Customer', to: 'Sales Desk', eta: 'Phụ thuộc phản hồi', status: 'Queued', note: 'Khi khách trả tên + SĐT, thread tự mở bước tạo brief thay vì làm lại từ đầu.' },
+      { from: 'Sales Desk', to: 'Technical Desk', eta: 'Sau khi đủ dữ liệu', status: 'Ready', note: 'Bàn giao scope/công suất sang kỹ thuật mà vẫn giữ nguyên catalog và lịch sử hỏi đáp.' },
     ],
     stationBoard: {
       title: 'Thread được chọn',
@@ -621,6 +660,17 @@ export const threadContextPacks: ThreadContextPack[] = [
       { role: 'user', meta: 'Need legal clarity', content: 'Tôi cần bản tóm tắt gọn, có nguồn, và chỉ ra những chỗ team hay hiểu sai khi tư vấn cho công trình hỗn hợp.' },
       { role: 'assistant', meta: 'Ready to export · peer review pending', content: 'Em đã chia phần căn cứ bắt buộc, phần dễ nhầm và phần cần kiểm tra chéo. Nếu anh muốn, em có thể xuất thêm một bản “không jargon” để sale dùng trực tiếp.' },
     ],
+    stageFlow: [
+      { key: 'review', label: 'Source review', owner: 'Knowledge Desk', status: 'Live', detail: 'Rà lại nguồn gốc viện dẫn và tách diễn giải nội bộ khỏi trích dẫn gốc.' },
+      { key: 'approve', label: 'Peer review approve', owner: 'Reviewer nội bộ', status: 'Next', detail: 'Một lượt peer review để khóa note trước khi vào thư viện dùng chung.' },
+      { key: 'export', label: 'Publish library artifact', owner: 'Knowledge Desk', status: 'Queued', detail: 'Đẩy legal summary và reviewer package vào library có kiểm soát.' },
+      { key: 'share', label: 'Cross-desk reuse', owner: 'Sales · Technical', status: 'Queued', detail: 'Sau publish, sale và kỹ thuật dùng cùng một note để tư vấn đồng nhất.' },
+    ],
+    transitionMoments: [
+      { from: 'Knowledge Desk', to: 'Reviewer', eta: '20m', status: 'Active', note: 'Reviewer nhận package rút gọn gồm summary và source cross-check note.' },
+      { from: 'Reviewer', to: 'Owner / Admin', eta: 'Sau peer review', status: 'Queued', note: 'Chỉ khi note sạch nguồn mới đi tiếp lên publish gate.' },
+      { from: 'Workspace library', to: 'Sales + Technical', eta: 'Ngay sau publish', status: 'Ready', note: 'Cùng một artifact được tái sử dụng thay vì mỗi desk tự diễn giải lại.' },
+    ],
     stationBoard: {
       title: 'Thread được chọn',
       status: 'Knowledge Desk · publish gate đang mở',
@@ -688,6 +738,17 @@ export const threadContextPacks: ThreadContextPack[] = [
       { role: 'assistant', meta: 'Admin Desk mode · onboarding shell', content: 'Em đang dựng bộ onboarding cho kỹ sư mới để họ vào đúng Technical Desk, thấy đúng thư viện và biết phải đọc SOP nào trong tuần đầu.' },
       { role: 'user', meta: 'Need structured onboarding', content: 'Giúp tôi biến tài liệu rời rạc thành gói onboarding rõ ràng cho kỹ sư mới, có FAQ và checklist tuần đầu.' },
       { role: 'assistant', meta: 'Workspace setup + access cues', content: 'Em đã gom được FAQ, checklist tuần đầu và note scope truy cập. Nếu anh muốn mở quyền rộng hơn Technical Desk, em sẽ gắn thêm bước admin approval để không lỏng quyền.' },
+    ],
+    stageFlow: [
+      { key: 'review', label: 'Onboarding pack review', owner: 'Admin Desk', status: 'Live', detail: 'Kiểm tra FAQ, checklist tuần đầu và tài liệu cần đọc trước khi gửi invite.' },
+      { key: 'approve', label: 'Scope approve', owner: 'Owner / Admin', status: 'Next', detail: 'Chốt user mới chỉ vào Technical Desk hay cần phạm vi rộng hơn.' },
+      { key: 'export', label: 'Send scoped invite', owner: 'Admin Desk', status: 'Queued', detail: 'Invite chỉ mở đúng desk, thư viện và project cần thiết.' },
+      { key: 'share', label: 'Mentor handoff continuity', owner: 'Admin + Technical Mentor', status: 'Queued', detail: 'Checklist tuần đầu đi cùng user mới để mentor không phải dựng lại từ đầu.' },
+    ],
+    transitionMoments: [
+      { from: 'Admin Desk', to: 'Owner / Admin', eta: '12m', status: 'Active', note: 'Đưa lên đúng câu hỏi về scope thay vì quăng cả bộ onboarding cho owner đọc.' },
+      { from: 'Owner / Admin', to: 'User mới', eta: 'Sau khi chốt quyền', status: 'Queued', note: 'Invite gửi đi cùng access note rõ ràng để user hiểu mình thấy gì và không thấy gì.' },
+      { from: 'User mới', to: 'Technical Mentor', eta: 'Ngày đầu', status: 'Ready', note: 'Mentor tiếp quản checklist tuần đầu và giữ continuity giữa auth, library và công việc thực tế.' },
     ],
     stationBoard: {
       title: 'Thread được chọn',

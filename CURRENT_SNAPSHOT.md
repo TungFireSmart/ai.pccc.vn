@@ -9,6 +9,7 @@ Milestone 3 — **Pre-approval candidate (next checkpoint depth pass)**
 - Frontend build đang pass ổn định
 - Narrative, walkthrough, approval-prep, và go-live-after-approval docs đã có
 - App hiện đã có review-quickbar, pre-approval check deck, decision strip, owner decision panel, after-approval roadmap block, cùng lớp interaction mới cho chat/auth/station
+- Checkpoint mới nhất đã thêm interactive stage navigator, live flow panel và role-to-role transition rail để review → approve → export/share và continuity giữa các desk nhìn sống hơn thay vì chỉ là copy mô tả
 
 ## Những gì mạnh nhất lúc này
 - Định vị AI chuyên ngành PCCC đã rõ

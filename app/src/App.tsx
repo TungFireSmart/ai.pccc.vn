@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import './App.css'
-import { heroStats, navItems, stationSignals, threadContextPacks, type Screen, type WorkspaceModeKey } from './data'
+import { heroStats, navItems, stationSignals, threadContextPacks, type FlowStageKey, type Screen, type WorkspaceModeKey } from './data'
 import { AuthScreen, ChatScreen, HomeScreen, StationScreen, TopNav } from './components'
 
 function App() {
@@ -8,6 +8,7 @@ function App() {
   const [activeThread, setActiveThread] = useState(threadContextPacks[0].threadTitle)
   const [activeAuth, setActiveAuth] = useState(threadContextPacks[0].authStageKey)
   const [activeMode, setActiveMode] = useState<WorkspaceModeKey>('owner')
+  const [activeStage, setActiveStage] = useState<FlowStageKey>('review')
   const activeContext = useMemo(() => threadContextPacks.find((item) => item.threadTitle === activeThread) ?? threadContextPacks[0], [activeThread])
 
   return (
@@ -36,10 +37,10 @@ function App() {
           </div>
         </section>
 
-        {screen === 'home' && <HomeScreen heroStats={heroStats} setScreen={setScreen} activeMode={activeMode} setActiveMode={setActiveMode} activeContext={activeContext} />}
+        {screen === 'home' && <HomeScreen heroStats={heroStats} setScreen={setScreen} activeMode={activeMode} setActiveMode={setActiveMode} activeContext={activeContext} activeStage={activeStage} setActiveStage={setActiveStage} />}
         {screen === 'auth' && <AuthScreen activeContext={activeContext} activeAuth={activeAuth} setActiveAuth={setActiveAuth} activeMode={activeMode} />}
-        {screen === 'chat' && <ChatScreen activeThread={activeThread} setActiveThread={setActiveThread} activeContext={activeContext} setActiveAuth={setActiveAuth} activeMode={activeMode} />}
-        {screen === 'station' && <StationScreen signals={stationSignals} activeContext={activeContext} setActiveThread={setActiveThread} setScreen={setScreen} setActiveAuth={setActiveAuth} activeMode={activeMode} />}
+        {screen === 'chat' && <ChatScreen activeThread={activeThread} setActiveThread={setActiveThread} activeContext={activeContext} setActiveAuth={setActiveAuth} activeMode={activeMode} activeStage={activeStage} setActiveStage={setActiveStage} />}
+        {screen === 'station' && <StationScreen signals={stationSignals} activeContext={activeContext} setActiveThread={setActiveThread} setScreen={setScreen} setActiveAuth={setActiveAuth} activeMode={activeMode} activeStage={activeStage} setActiveStage={setActiveStage} />}
       </main>
     </div>
   )

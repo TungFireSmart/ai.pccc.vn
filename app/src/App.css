@@ -1481,3 +1481,125 @@ button {
   margin-top: 8px;
   color: #8ca4bf;
 }
+
+.stage-navigator,
+.live-flow-card,
+.transition-card,
+.stage-pill {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.03));
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.28);
+}
+
+.stage-navigator {
+  display: grid;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 24px;
+  margin-bottom: 28px;
+}
+
+.stage-navigator p,
+.live-flow-card p,
+.transition-card p,
+.stage-pill span,
+.stage-pill small,
+.transition-card small {
+  color: #a9bed4;
+}
+
+.stage-navigator strong,
+.live-flow-card strong,
+.transition-card strong,
+.stage-pill strong {
+  color: #f7fbff;
+}
+
+.stage-pill-row,
+.live-flow-grid,
+.transition-rail {
+  display: grid;
+  gap: 14px;
+}
+
+.stage-pill-row {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stage-pill {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 20px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.stage-pill small {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.stage-pill.active,
+.live-flow-card.emphasis {
+  background: linear-gradient(135deg, rgba(123, 245, 231, 0.14), rgba(120, 169, 255, 0.14));
+  border-color: rgba(123, 245, 231, 0.26);
+}
+
+.live-flow-grid,
+.transition-rail {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.live-flow-grid {
+  margin-bottom: 8px;
+}
+
+.live-flow-card,
+.transition-card {
+  padding: 18px;
+  border-radius: 22px;
+}
+
+.transition-card.state-active {
+  border-color: rgba(255, 206, 96, 0.3);
+  background: linear-gradient(180deg, rgba(255, 206, 96, 0.08), rgba(255, 255, 255, 0.03));
+}
+
+.transition-card.state-ready {
+  border-color: rgba(123, 245, 231, 0.22);
+}
+
+.transition-card.state-queued {
+  border-color: rgba(255, 141, 141, 0.24);
+}
+
+.transition-state.transition-active {
+  border-color: rgba(255, 206, 96, 0.3);
+  background: rgba(255, 206, 96, 0.12);
+  color: #ffe7a9;
+}
+
+.transition-state.transition-ready {
+  border-color: rgba(123, 245, 231, 0.22);
+  background: rgba(123, 245, 231, 0.12);
+  color: #dffdf9;
+}
+
+.transition-state.transition-queued {
+  border-color: rgba(255, 141, 141, 0.24);
+  background: rgba(255, 111, 111, 0.08);
+  color: #ffd3d3;
+}
+
+.side-block .transition-rail {
+  grid-template-columns: 1fr;
+}
+
+@media (max-width: 1280px) {
+  .stage-pill-row,
+  .live-flow-grid,
+  .transition-rail {
+    grid-template-columns: 1fr;
+  }
+}
