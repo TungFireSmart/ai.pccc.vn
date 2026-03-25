@@ -252,6 +252,12 @@ button {
   margin-top: 10px;
 }
 
+.badge.subtle {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #d9e8f8;
+}
+
 .mini-tags.right {
   justify-content: flex-end;
 }
@@ -866,6 +872,140 @@ button {
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+.metric-grid,
+.file-list,
+.trust-list,
+.team-grid,
+.queue-list {
+  display: grid;
+  gap: 12px;
+}
+
+.metric-grid,
+.team-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.metric-card,
+.file-card,
+.trust-card,
+.team-card,
+.queue-card,
+.mini-check-card {
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.03));
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.2);
+}
+
+.metric-card strong,
+.file-card strong,
+.trust-card strong,
+.team-card strong,
+.queue-card strong,
+.mini-check-card strong {
+  display: block;
+  color: #f7fbff;
+}
+
+.metric-card p,
+.file-card p,
+.trust-card p,
+.team-card p,
+.queue-card p,
+.mini-check-card p,
+.metric-card small,
+.team-card small {
+  color: #9eb2ca;
+  margin: 0;
+  line-height: 1.7;
+}
+
+.metric-card small {
+  display: block;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.metric-card strong {
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+
+.thread-meta-row,
+.thread-footer-row,
+.composer-mode-row,
+.team-card-head {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.thread-meta-row {
+  margin-top: 12px;
+}
+
+.thread-footer-row {
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.thread-footer-row small,
+.file-card span,
+.queue-card span,
+.team-card-head span {
+  color: #90a8c2;
+}
+
+.section-subhead {
+  margin: 20px 0 12px;
+}
+
+.section-subhead.roomy {
+  margin-top: 24px;
+}
+
+.file-card,
+.queue-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+}
+
+.file-card span,
+.queue-card span,
+.team-card-head span {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(120, 169, 255, 0.12);
+  border: 1px solid rgba(120, 169, 255, 0.16);
+}
+
+.trust-card.good {
+  border-color: rgba(123, 245, 231, 0.22);
+}
+
+.trust-card.warning {
+  border-color: rgba(255, 141, 141, 0.24);
+  background: linear-gradient(180deg, rgba(255, 111, 111, 0.08), rgba(255, 255, 255, 0.03));
+}
+
+.auth-mini-grid {
+  margin-top: 4px;
+}
+
+.mini-check-card p {
+  margin-top: 8px;
+}
+
+.composer-mode-row {
+  margin: 18px 0 10px;
+}
+
 @media (max-width: 1280px) {
   .hero-panel,
   .auth-layout,
@@ -878,7 +1018,9 @@ button {
   .board-grid,
   .stat-grid,
   .flow-grid,
-  .account-grid {
+  .account-grid,
+  .metric-grid,
+  .team-grid {
     grid-template-columns: 1fr;
   }
 

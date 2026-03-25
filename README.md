@@ -21,7 +21,7 @@ Trạng thái: pre-approval candidate đã freeze-for-review, sẵn để owner 
 - Product foundation docs: done
 - Frontend prototype: running/building successfully
 - Internal review build: complete and ready for owner review
-- Latest UX pass: deeper chat shell, multi-state auth, and account/workspace/admin concepts added to the prototype
+- Latest UX pass: deeper chat shell, stronger auth trust UX, and a more credible AI Station operating layer added to the prototype
 - Third-party go-live services: intentionally deferred until after approval
 
 ## Core project docs

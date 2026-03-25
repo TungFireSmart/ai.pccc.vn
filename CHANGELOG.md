@@ -20,3 +20,6 @@
 - Added a pre-approval question deck on Home and an after-approval roadmap block on Enterprise to make the build more decision-ready.
 - Added `DECISION_SHEET.md` so owner review can converge into concrete next-step choices faster.
 - Added a sticky `review-quickbar` across the app to make the review path obvious at first glance.
+- Shipped the next Milestone 3 checkpoint: chat management now includes ownership, SLA/unread cues, artifact/file context, and stronger thread controls.
+- Strengthened auth UX with trust-state messaging, device/session/security cues, richer signup/SSO/reset/invite states, and clearer workspace-entry framing.
+- Upgraded AI Station with team roster, handoff queue, usage/admin cues, and a more credible operating-layer narrative for productization review.

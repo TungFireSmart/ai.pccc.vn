@@ -2,15 +2,20 @@ import { useMemo, useState } from 'react'
 import type {
   AccountCard,
   AuthStage,
+  AuthTrustItem,
   Feature,
+  FileItem,
   FlowStep,
   InboxItem,
   Message,
+  MiniMetric,
   NavItem,
   Persona,
   Screen,
   Stat,
   StationCard,
+  StationQueueItem,
+  TeamMember,
   WorkspaceBoard,
   ChatThread,
 } from './data'
@@ -19,7 +24,10 @@ import {
   authBenefits,
   authFlowSteps,
   authStages,
+  authTrustItems,
+  activeThreadFiles,
   chatMessages,
+  chatMetrics,
   chatSideOutputs,
   chatThreads,
   conversationStates,
@@ -27,6 +35,8 @@ import {
   productFeatures,
   stationBoards,
   stationCards,
+  stationQueue,
+  stationRoster,
   stationTimeline,
   suggestedPrompts,
   workspacePulse,
@@ -134,7 +144,14 @@ function ThreadList({ items, activeTitle, onSelect }: { items: ChatThread[]; act
           </div>
           <strong>{thread.title}</strong>
           <small>{thread.preview}</small>
-          <div className="thread-state">{thread.state}</div>
+          <div className="thread-meta-row">
+            <span className="badge subtle">{thread.owner}</span>
+            {thread.unread && <span className="badge subtle">{thread.unread}</span>}
+          </div>
+          <div className="thread-footer-row">
+            <div className="thread-state">{thread.state}</div>
+            <small>{thread.sla}</small>
+          </div>
         </button>
       ))}
     </div>
@@ -222,6 +239,80 @@ function AccountGrid({ items }: { items: AccountCard[] }) {
   )
 }
 
+function MetricGrid({ items }: { items: MiniMetric[] }) {
+  return (
+    <div className="metric-grid">
+      {items.map((item) => (
+        <article className="metric-card" key={item.label}>
+          <small>{item.label}</small>
+          <strong>{item.value}</strong>
+          <p>{item.note}</p>
+        </article>
+      ))}
+    </div>
+  )
+}
+
+function FileList({ items }: { items: FileItem[] }) {
+  return (
+    <div className="file-list">
+      {items.map((item) => (
+        <article className="file-card" key={item.name}>
+          <div>
+            <strong>{item.name}</strong>
+            <p>{item.kind}</p>
+          </div>
+          <span>{item.status}</span>
+        </article>
+      ))}
+    </div>
+  )
+}
+
+function TrustList({ items }: { items: AuthTrustItem[] }) {
+  return (
+    <div className="trust-list">
+      {items.map((item) => (
+        <article className={`trust-card ${item.tone ?? 'default'}`} key={item.label}>
+          <strong>{item.label}</strong>
+          <p>{item.detail}</p>
+        </article>
+      ))}
+    </div>
+  )
+}
+
+function TeamGrid({ items }: { items: TeamMember[] }) {
+  return (
+    <div className="team-grid">
+      {items.map((item) => (
+        <article className="team-card" key={item.name}>
+          <div className="team-card-head">
+            <strong>{item.name}</strong>
+            <span>{item.status}</span>
+          </div>
+          <small>{item.role}</small>
+          <p>{item.focus}</p>
+        </article>
+      ))}
+    </div>
+  )
+}
+
+function QueueList({ items }: { items: StationQueueItem[] }) {
+  return (
+    <div className="queue-list">
+      {items.map((item) => (
+        <article className="queue-card" key={item.task}>
+          <strong>{item.task}</strong>
+          <p>{item.owner} · ETA {item.eta}</p>
+          <span>{item.status}</span>
+        </article>
+      ))}
+    </div>
+  )
+}
+
 function AuthPreview({ stage }: { stage: AuthStage }) {
   if (stage.key === 'signup') {
     return (
@@ -230,7 +321,7 @@ function AuthPreview({ stage }: { stage: AuthStage }) {
           <div className="brand-mark">AI</div>
           <div>
             <strong>Tạo AI Station mới</strong>
-            <small>Khởi tạo workspace cho sale, kỹ thuật và hồ sơ</small>
+            <small>Khởi tạo workspace cho sale, kỹ thuật, hồ sơ và thư viện nội bộ</small>
           </div>
         </div>
         <label>
@@ -245,6 +336,16 @@ function AuthPreview({ stage }: { stage: AuthStage }) {
           <label>
             Use case ưu tiên
             <input value="HSMT + Sale + Knowledge" readOnly />
+          </label>
+        </div>
+        <div className="double-grid">
+          <label>
+            Billing owner
+            <input value="admin@pccc.vn" readOnly />
+          </label>
+          <label>
+            First desk to enable
+            <input value="Bid Desk" readOnly />
           </label>
         </div>
         <button className="primary-btn full">Tạo workspace</button>
@@ -267,12 +368,17 @@ function AuthPreview({ stage }: { stage: AuthStage }) {
           <strong>Detected domain</strong>
           <p>pccc.vn · Cho phép vào workspace “AI Station PCCC Vietnam” với vai trò Owner.</p>
         </div>
-        <button className="social-btn">Chọn tài khoản Google</button>
-        <div className="mini-tags stack">
-          <span>SSO concept</span>
-          <span>Domain-aware</span>
-          <span>Invite-safe</span>
+        <div className="double-grid auth-mini-grid">
+          <div className="mini-check-card">
+            <strong>Domain policy</strong>
+            <p>Chỉ email công ty và lời mời hợp lệ mới vào được workspace chính.</p>
+          </div>
+          <div className="mini-check-card">
+            <strong>Landing after entry</strong>
+            <p>Mở thẳng AI Station với các thread, desk và review queue gần nhất.</p>
+          </div>
         </div>
+        <button className="social-btn">Chọn tài khoản Google</button>
       </div>
     )
   }
@@ -291,10 +397,20 @@ function AuthPreview({ stage }: { stage: AuthStage }) {
           Email công việc
           <input value="admin@pccc.vn" readOnly />
         </label>
+        <div className="double-grid auth-mini-grid">
+          <div className="mini-check-card">
+            <strong>Link hết hạn sau</strong>
+            <p>15 phút · dùng một lần · yêu cầu xác nhận device nếu truy cập từ máy lạ.</p>
+          </div>
+          <div className="mini-check-card">
+            <strong>Recovery fallback</strong>
+            <p>Có thể dùng backup codes hoặc xác nhận qua email recovery nếu mất điện thoại.</p>
+          </div>
+        </div>
         <button className="primary-btn full">Gửi link đặt lại mật khẩu</button>
         <div className="signup-box compact">
-          <strong>Thông điệp hiển thị sau khi gửi</strong>
-          <p>Link có hiệu lực 15 phút. Nếu email này thuộc workspace, anh sẽ nhận được hướng dẫn ngay.</p>
+          <strong>Thông điệp sau khi gửi</strong>
+          <p>Link có hiệu lực 15 phút. Nếu email này thuộc workspace, anh sẽ nhận được hướng dẫn ngay cùng cảnh báo bảo mật nếu đây không phải yêu cầu của anh.</p>
         </div>
       </div>
     )
@@ -313,7 +429,17 @@ function AuthPreview({ stage }: { stage: AuthStage }) {
         <div className="invite-card">
           <small>Lời mời hợp lệ</small>
           <strong>AI Station PCCC Vietnam</strong>
-          <p>Người mời: admin@pccc.vn · Vai trò được gán: Sales Lead · Scope: Sales Desk + shared project library</p>
+          <p>Người mời: admin@pccc.vn · Vai trò: Sales Lead · Scope: Sales Desk + shared project library · Hết hạn sau 23 giờ</p>
+        </div>
+        <div className="double-grid auth-mini-grid">
+          <div className="mini-check-card">
+            <strong>Data scope</strong>
+            <p>Chỉ thấy thread, library và output thuộc Sales Desk + các project được chia sẻ.</p>
+          </div>
+          <div className="mini-check-card">
+            <strong>First landing</strong>
+            <p>Mở dashboard cá nhân với handoff queue và quy trình follow-up khách mới.</p>
+          </div>
         </div>
         <div className="double-grid">
           <button className="secondary-btn">Xem quyền truy cập</button>
@@ -342,6 +468,16 @@ function AuthPreview({ stage }: { stage: AuthStage }) {
         Mật khẩu
         <input value="••••••••••••" readOnly />
       </label>
+      <div className="double-grid auth-mini-grid">
+        <div className="mini-check-card">
+          <strong>MFA</strong>
+          <p>OTP qua app xác thực khi đăng nhập từ thiết bị lạ hoặc khi thay đổi quyền admin.</p>
+        </div>
+        <div className="mini-check-card">
+          <strong>Workspace target</strong>
+          <p>AI Station PCCC Vietnam · Owner landing · đồng bộ thread và queue gần nhất.</p>
+        </div>
+      </div>
       <div className="auth-row">
         <label className="checkbox-row"><input type="checkbox" checked readOnly /> Giữ đăng nhập cho workspace này</label>
         <button className="text-link">Quên mật khẩu?</button>
@@ -349,7 +485,7 @@ function AuthPreview({ stage }: { stage: AuthStage }) {
       <button className="primary-btn full">Đăng nhập</button>
       <div className="signup-box">
         <strong>Chưa có workspace?</strong>
-        <p>Tạo team space cho sale, kỹ thuật, hồ sơ và thư viện nội bộ trong một flow onboarding ngắn.</p>
+        <p>Tạo team space cho sale, kỹ thuật, hồ sơ và thư viện nội bộ trong một flow onboarding ngắn nhưng đủ rõ quyền và ownership.</p>
         <button className="secondary-btn full">Tạo workspace mới</button>
       </div>
     </div>
@@ -362,15 +498,15 @@ export function HomeScreen({ heroStats, setScreen }: { heroStats: Stat[]; setScr
       <section className="hero-panel">
         <div className="hero-copy">
           <div className="eyebrow">AI PCCC PLATFORM · CHAT-FIRST WORKSPACE</div>
-          <h1>Refactor mạnh hơn: chat app sâu hơn, auth rõ hơn, và lớp quản trị user/workspace đã có hình.</h1>
+          <h1>Bản checkpoint này đẩy sản phẩm gần hơn một SaaS thật: chat có nhịp vận hành, auth có trust, và AI Station có logic điều phối.</h1>
           <p>
-            Bản này không chỉ đẹp hơn. Nó giải quyết đúng 3 điểm người duyệt cần thấy: cảm giác chat như sản phẩm thật,
-            luồng vào/ra workspace rõ ràng, và câu chuyện quản trị doanh nghiệp đủ thuyết phục để tiếp tục productize.
+            Mục tiêu không phải thêm màn hình cho nhiều. Mục tiêu là để người duyệt nhìn vào thấy ngay: sản phẩm này có thể lớn lên thành
+            một nền làm việc thật cho sale, kỹ thuật, hồ sơ và admin trong ngành PCCC.
           </p>
           <div className="hero-actions">
             <button className="primary-btn" onClick={() => setScreen('chat')}>Xem chat shell sâu hơn</button>
             <button className="secondary-btn" onClick={() => setScreen('auth')}>Xem auth flows</button>
-            <button className="secondary-btn" onClick={() => setScreen('station')}>Xem workspace/admin</button>
+            <button className="secondary-btn" onClick={() => setScreen('station')}>Xem AI Station</button>
           </div>
           <StatGrid stats={heroStats} />
         </div>
@@ -380,24 +516,24 @@ export function HomeScreen({ heroStats, setScreen }: { heroStats: Stat[]; setScr
             <span className="dot red"></span>
             <span className="dot yellow"></span>
             <span className="dot green"></span>
-            <span className="window-title">ai.pccc.vn / review candidate v3</span>
+            <span className="window-title">ai.pccc.vn / next checkpoint</span>
           </div>
           <div className="hero-preview-stack">
             <div className="preview-tile highlight">
-              <small>Chat shell</small>
-              <strong>Sidebar có state, thread actions, context rail, composer và output flow rõ hơn</strong>
+              <small>Chat management</small>
+              <strong>Thread có owner, unread, SLA, file context, artifacts và handoff cues</strong>
             </div>
             <div className="preview-tile">
               <small>Auth UX</small>
-              <strong>Login · signup · Google · reset · team invite trong cùng một logic mạch lạc</strong>
+              <strong>Login, SSO, reset, invite và signup đều có trust narrative thay vì chỉ là form đẹp</strong>
             </div>
             <div className="preview-tile">
-              <small>User management</small>
-              <strong>Account, workspace, role, billing và admin concepts đã được đưa vào giao diện</strong>
+              <small>AI Station</small>
+              <strong>Có roster, queue, desks, usage và admin cues để đáng tin hơn cho môi trường doanh nghiệp</strong>
             </div>
             <div className="preview-tile">
               <small>PCCC specialization</small>
-              <strong>Toàn bộ sample flow vẫn neo chắc vào sale, HSMT, kỹ thuật và knowledge nội bộ</strong>
+              <strong>Tất cả sample flow vẫn neo chắc vào sale, HSMT, kỹ thuật, SOP và thư viện nội bộ</strong>
             </div>
           </div>
         </div>
@@ -406,8 +542,8 @@ export function HomeScreen({ heroStats, setScreen }: { heroStats: Stat[]; setScr
       <section className="section-block">
         <div className="section-head">
           <span className="eyebrow">WHAT CHANGED</span>
-          <h2>Từ prototype đơn giản sang một frontend reviewable có chiều sâu sản phẩm</h2>
-          <p>Trọng tâm không còn là “có màn hình”. Trọng tâm là mỗi màn hình đều kể được product story đúng phần việc của nó.</p>
+          <h2>Một vertical slice sâu hơn, ít demo hơn và đáng tin hơn</h2>
+          <p>Trọng tâm là tăng độ thật của những chỗ sẽ bị soi đầu tiên khi nghĩ về việc productize.</p>
         </div>
         <FeatureGrid items={productFeatures} />
       </section>
@@ -415,17 +551,16 @@ export function HomeScreen({ heroStats, setScreen }: { heroStats: Stat[]; setScr
       <section className="section-block story-layout">
         <div className="story-card glass-panel">
           <span className="eyebrow">CHAT FEEL</span>
-          <h2>Sidebar, thread state và output rail giúp màn chat gần trải nghiệm SaaS thật hơn nhiều.</h2>
+          <h2>Không còn giống một khung hỏi đáp tĩnh; giờ đã có dấu hiệu thread đang được vận hành bởi team.</h2>
           <p>
-            Người duyệt có thể nhìn ra ngay: cuộc hội thoại nào đang active, cái nào nên archive, cái nào cần rename,
-            và output nào đang được tạo từ cùng một context.
+            Owner, SLA, unread, files, output queue và pulse panel làm phần chat bớt “demo screen” và gần hơn với công cụ làm việc thật.
           </p>
         </div>
         <div className="story-card glass-panel">
-          <span className="eyebrow">ADMIN NARRATIVE</span>
-          <h2>Auth và workspace không còn rời rạc, mà nối thành câu chuyện owner → team → quyền → billing.</h2>
+          <span className="eyebrow">STATION LAYER</span>
+          <h2>AI Station bây giờ kể được câu chuyện từ account → team → desk → queue → policy.</h2>
           <p>
-            Đây là phần giúp bản prototype vượt khỏi “AI demo”. Nó gợi được cấu trúc sản phẩm đủ mạnh cho công ty PCCC dùng thật sau này.
+            Đây là thứ làm cho sản phẩm có vẻ đủ lực để đi tiếp sang MVP, thay vì dừng lại ở một landing đẹp có hộp chat.
           </p>
         </div>
       </section>
@@ -433,7 +568,7 @@ export function HomeScreen({ heroStats, setScreen }: { heroStats: Stat[]; setScr
       <section className="section-block">
         <div className="section-head">
           <span className="eyebrow">USER GROUPS</span>
-          <h2>Giá trị theo vai trò vẫn rõ, nhưng nay đã gắn với quyền và điểm vào phù hợp</h2>
+          <h2>Giá trị theo vai trò vẫn rõ, nhưng đã gắn với ownership và desk logic thực tế hơn</h2>
         </div>
         <PersonaGrid items={personas} />
       </section>
@@ -450,10 +585,10 @@ export function AuthScreen() {
       <div className="auth-copy">
         <div className="section-head left">
           <span className="eyebrow">AUTH EXPERIENCE</span>
-          <h2>Flow rõ từ cá nhân dùng thử đến team workspace, không còn chỉ là một form đăng nhập</h2>
+          <h2>Auth được nâng từ “đăng nhập đẹp” thành “vào đúng workspace với đủ tín hiệu an toàn”</h2>
           <p>
-            Màn này cho thấy rõ những trạng thái quan trọng nhất của sản phẩm: quay lại workspace, tạo mới, đi vào bằng Google,
-            khôi phục truy cập và chấp nhận lời mời vào team.
+            Màn này cho thấy các trạng thái quan trọng nhất của một sản phẩm B2B: quay lại workspace, tạo mới, vào bằng Google,
+            khôi phục truy cập, chấp nhận lời mời và hiểu ngay mình đang đi vào phạm vi nào.
           </p>
         </div>
 
@@ -469,6 +604,7 @@ export function AuthScreen() {
         </div>
 
         <FlowGrid items={authFlowSteps} />
+        <TrustList items={authTrustItems} />
         <FeatureGrid items={authBenefits} />
       </div>
 
@@ -487,13 +623,20 @@ export function AuthScreen() {
 
 export function ChatScreen() {
   const [activeThread, setActiveThread] = useState(chatThreads.find((item) => item.active)?.title ?? chatThreads[0].title)
+  const currentThread = useMemo(() => chatThreads.find((item) => item.title === activeThread) ?? chatThreads[0], [activeThread])
 
   return (
     <section className="chat-shell-layout expanded-chat">
       <aside className="chat-sidebar glass-panel">
         <div className="sidebar-top">
           <button className="primary-btn full">+ Phiên chat mới</button>
-          <div className="search-chip">Tìm theo công trình, khách hàng, SOP…</div>
+          <div className="search-chip">Tìm theo công trình, khách hàng, SOP, tiêu chuẩn, ticket nội bộ…</div>
+          <div className="mini-tags stack">
+            <span>Open</span>
+            <span>Assigned</span>
+            <span>Need review</span>
+            <span>Archived</span>
+          </div>
         </div>
 
         <div className="sidebar-section">
@@ -516,22 +659,25 @@ export function ChatScreen() {
         <div className="chat-head-row">
           <div>
             <span className="eyebrow">CHATGPT-LIKE SHELL · PCCC MODE</span>
-            <h2>Khung chat quen thuộc, nhưng có cảm giác điều phối công việc thật chứ không chỉ trả lời một lượt</h2>
+            <h2>Khung chat quen thuộc, nhưng đã có owner, SLA, file stack và output handoff như một công cụ làm việc thật</h2>
           </div>
           <div className="header-tags">
             <span>Hồ sơ thầu</span>
             <span>Nhà xưởng Bình Dương</span>
-            <span>Output ready</span>
+            <span>{currentThread.owner}</span>
           </div>
         </div>
+
+        <MetricGrid items={chatMetrics} />
 
         <div className="chat-title-strip">
           <div>
             <strong>{activeThread}</strong>
-            <p>Đang dùng cùng project context, shared files và note kỹ thuật để tránh lệch output.</p>
+            <p>Đang dùng cùng project context, shared files và note kỹ thuật để tránh lệch output. Owner hiện tại: {currentThread.owner}.</p>
           </div>
           <div className="title-actions">
             <button className="secondary-btn slim">Rename</button>
+            <button className="secondary-btn slim">Assign</button>
             <button className="secondary-btn slim">Archive</button>
             <button className="secondary-btn slim danger">Delete</button>
           </div>
@@ -539,27 +685,38 @@ export function ChatScreen() {
 
         <MessageList items={chatMessages} />
 
+        <div className="section-subhead">
+          <small className="sidebar-label">Artifacts & source files</small>
+        </div>
+        <FileList items={activeThreadFiles} />
+
         <div className="prompt-row">
           {suggestedPrompts.map((prompt) => (
             <button className="chip-btn" key={prompt}>{prompt}</button>
           ))}
         </div>
 
+        <div className="composer-mode-row">
+          <span className="badge">Ask</span>
+          <span className="badge subtle">Draft</span>
+          <span className="badge subtle">Extract</span>
+          <span className="badge subtle">Assign</span>
+        </div>
         <div className="composer-row">
           <div className="upload-box">+ Tải PDF, DOCX, XLSX, ảnh, hồ sơ thầu hoặc công văn</div>
           <div className="composer-box">Mô tả yêu cầu, dán nội dung, hoặc kéo thả hồ sơ vào đây…</div>
           <button className="primary-btn composer-send">Gửi</button>
         </div>
         <div className="composer-footnote">
-          Agent sẽ giữ chung context theo thread hiện tại và gợi xuất song song checklist · email · note kỹ thuật nếu phù hợp.
+          Agent sẽ giữ chung context theo thread hiện tại, gợi xuất checklist · email · note kỹ thuật và cho phép giao ownership sang desk khác khi cần.
         </div>
       </main>
 
       <aside className="chat-sidepanel glass-panel">
         <div className="side-block">
           <small className="sidebar-label">Context live</small>
-          <strong>Agent: Hồ sơ thầu</strong>
-          <p>Đang ưu tiên rà HSMT, checklist nộp hồ sơ, draft email phân việc và note hỏi kỹ thuật.</p>
+          <strong>{currentThread.owner}</strong>
+          <p>{currentThread.state} · {currentThread.sla} · dùng chung project context để giảm lệch giữa các artifact.</p>
         </div>
         <div className="side-block">
           <small className="sidebar-label">Workspace pulse</small>
@@ -573,15 +730,9 @@ export function ChatScreen() {
             ))}
           </div>
         </div>
-        <div className="side-block">
-          <small className="sidebar-label">User menu concepts</small>
-          <div className="mini-tags stack">
-            <span>Account</span>
-            <span>Workspace</span>
-            <span>Role</span>
-            <span>Billing</span>
-            <span>Admin panel</span>
-          </div>
+        <div className="side-block emphasis">
+          <small className="sidebar-label">Thread controls</small>
+          <p>Cho thấy hướng sản phẩm: assign owner, track unread, export artifact, archive xong việc và giữ decision trail theo từng thread.</p>
         </div>
       </aside>
     </section>
@@ -593,10 +744,10 @@ export function StationScreen({ signals }: { signals: Stat[] }) {
     <section className="station-layout">
       <div className="section-head left">
         <span className="eyebrow">AI STATION · WORKSPACE ADMIN</span>
-        <h2>Khung workspace giờ có cả lớp account, team, role và admin narrative</h2>
+        <h2>AI Station giờ đáng tin hơn vì có người, việc, queue, usage và admin direction trong cùng một không gian</h2>
         <p>
-          Đây là tầng trên của chat app: nơi owner thấy được thành viên, workspace plan, quyền truy cập, billing concept
-          và tiến trình phối hợp giữa sales · kỹ thuật · hồ sơ trên cùng một nền.
+          Đây là tầng trên của chat app: nơi owner thấy thành viên, desk, quyền truy cập, queue chờ xử lý, billing concept,
+          library signal và tiến trình phối hợp giữa sales · kỹ thuật · hồ sơ trên cùng một nền.
         </p>
       </div>
 
@@ -608,26 +759,37 @@ export function StationScreen({ signals }: { signals: Stat[] }) {
         <div className="station-left glass-panel">
           <div className="station-shell-head">
             <strong>Workspace desks</strong>
-            <span>Thiết kế để sau này cắm member thật, role thật, quota, project access và audit trail</span>
+            <span>Thiết kế để sau này cắm member thật, role thật, quota, project access, audit trail và handoff logic.</span>
           </div>
           <StationCardGrid items={stationCards} />
+
+          <div className="section-subhead roomy">
+            <small className="sidebar-label">Team roster</small>
+          </div>
+          <TeamGrid items={stationRoster} />
         </div>
 
         <div className="station-right glass-panel">
           <div className="station-shell-head">
             <strong>Live timeline</strong>
-            <span>Gợi cảm giác một trạm điều phối công việc AI chứ không chỉ là hộp chat</span>
+            <span>Gợi cảm giác một trạm điều phối công việc AI có queue và review, chứ không chỉ là hộp chat đẹp.</span>
           </div>
           <div className="timeline-list">
             {stationTimeline.map((item) => (
               <div className="timeline-item" key={item}>{item}</div>
             ))}
           </div>
+
+          <div className="section-subhead roomy">
+            <small className="sidebar-label">Handoff queue</small>
+          </div>
+          <QueueList items={stationQueue} />
+
           <div className="side-block emphasis">
             <small className="sidebar-label">Admin direction</small>
             <p>
-              Station này phù hợp để review đường productization: owner center, team invite, role-based workspace,
-              shared library, audit summary và billing ownership trong cùng một câu chuyện sản phẩm.
+              Station này đã đủ sức kể đường productization: owner center, trusted entry, desk-based workspace,
+              shared library, queue visibility, audit summary và billing ownership trong cùng một narrative.
             </p>
           </div>
         </div>

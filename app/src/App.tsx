@@ -22,13 +22,13 @@ function App() {
       <main className="main-shell">
         <section className="review-ribbon glass-panel">
           <div>
-            <strong>Reviewable UI refactor · v3 depth pass</strong>
-            <p>Landing · auth states · chat management · account/workspace/admin concepts. Tập trung vào cảm giác sản phẩm thật hơn.</p>
+            <strong>Next checkpoint · product-depth pass</strong>
+            <p>Chat management thực hơn · auth trust mạnh hơn · AI Station usable hơn. Tập trung vào cảm giác sản phẩm có thể vận hành.</p>
           </div>
           <div className="mini-tags right">
-            <span>Chat-first</span>
-            <span>Auth clearer</span>
-            <span>Admin-ready</span>
+            <span>Chat ops</span>
+            <span>Trust-first auth</span>
+            <span>Station layer</span>
           </div>
         </section>
 

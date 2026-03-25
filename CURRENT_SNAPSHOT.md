@@ -1,7 +1,7 @@
 # CURRENT SNAPSHOT — ai.pccc.vn
 
 ## Current stage
-Milestone 3 — **Pre-approval candidate**
+Milestone 3 — **Pre-approval candidate (next checkpoint depth pass)**
 
 ## Current status
 - Milestone 2 đã hoàn tất cho review nội bộ
