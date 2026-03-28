@@ -2,28 +2,34 @@ import { useMemo, useState } from 'react'
 import './App.css'
 import { heroStats, navItems, stationSignals, threadContextPacks, type FlowStageKey, type Screen, type WorkspaceModeKey } from './data'
 import { AuthScreen, ChatScreen, HomeScreen, StationScreen, TopNav } from './components'
+import { useAuthState } from './auth-store'
 
 function App() {
   const [screen, setScreen] = useState<Screen>('home')
-  const [activeThread, setBậtThread] = useState(threadContextPacks[0].threadTitle)
-  const [activeAuth, setBậtAuth] = useState(threadContextPacks[0].authStageKey)
-  const [activeMode, setBậtMode] = useState<WorkspaceModeKey>('owner')
-  const [activeStage, setBậtStage] = useState<FlowStageKey>('review')
+  const [activeThread, setActiveThread] = useState(threadContextPacks[0].threadTitle)
+  const [activeAuth, setActiveAuth] = useState(threadContextPacks[0].authStageKey)
+  const [activeMode, setActiveMode] = useState<WorkspaceModeKey>('owner')
+  const [activeStage, setActiveStage] = useState<FlowStageKey>('review')
+  const { auth, setAuth } = useAuthState()
+
   const activeContext = useMemo(() => threadContextPacks.find((item) => item.threadTitle === activeThread) ?? threadContextPacks[0], [activeThread])
+
   const reviewRibbon = useMemo(() => {
     if (screen === 'auth') {
       return {
-        title: 'Cần xem · vào đúng quyền',
-        description: 'Màn này trả lời nhanh: vào đúng workspace và đúng quyền chưa.',
-        tags: ['Auth-aware', 'Scoped entry', 'Trust'],
+        title: auth ? 'Cần xem · phiên đăng nhập' : 'Cần xem · vào đúng quyền',
+        description: auth
+          ? `Đã vào ${auth.workspace.name}. Có thể dùng token local để nối tiếp sang chat/API.`
+          : 'Màn này trả lời nhanh: vào đúng workspace và đúng quyền chưa.',
+        tags: auth ? ['Signed in', auth.workspace.slug, auth.role ?? 'member'] : ['Auth-aware', 'Scoped entry', 'Trust'],
       }
     }
 
     if (screen === 'chat') {
       return {
         title: 'Cần xem · thread làm việc thật',
-        description: 'Màn này phải cho thấy thread đủ thật để tin được.',
-        tags: ['Ownership', 'Approval', 'Continuity'],
+        description: auth ? 'Đã sẵn nền auth local để nối tiếp thread thật từ API.' : 'Màn này phải cho thấy thread đủ thật để tin được.',
+        tags: auth ? ['API-ready', 'Auth OK', 'Thread next'] : ['Ownership', 'Approval', 'Continuity'],
       }
     }
 
@@ -36,11 +42,11 @@ function App() {
     }
 
     return {
-      title: 'Next · sẵn để duyệt',
-      description: 'Role-based landing, approval và export đã đủ để bản này gần sản phẩm nội bộ hơn.',
-      tags: ['Role-based workspace', 'Approval + export realism', 'Pilot-ready flows'],
+      title: auth ? 'Next · Phase 2 đang chạy' : 'Next · sẵn để duyệt',
+      description: auth ? `Auth local đã có. Tiếp theo là nối chat thật bằng API ở workspace ${auth.workspace.name}.` : 'Role-based landing, approval và export đã đủ để bản này gần sản phẩm nội bộ hơn.',
+      tags: auth ? ['Phase 2', 'Backend live', 'Frontend next'] : ['Role-based workspace', 'Approval + export realism', 'Pilot-ready flows'],
     }
-  }, [screen])
+  }, [screen, auth])
 
   return (
     <div className="app-shell">
@@ -68,10 +74,10 @@ function App() {
           </div>
         </section>
 
-        {screen === 'home' && <HomeScreen heroStats={heroStats} setScreen={setScreen} activeMode={activeMode} setBậtMode={setBậtMode} activeContext={activeContext} activeStage={activeStage} setBậtStage={setBậtStage} />}
-        {screen === 'auth' && <AuthScreen activeContext={activeContext} activeAuth={activeAuth} setBậtAuth={setBậtAuth} activeMode={activeMode} />}
-        {screen === 'chat' && <ChatScreen activeThread={activeThread} setBậtThread={setBậtThread} activeContext={activeContext} setBậtAuth={setBậtAuth} activeMode={activeMode} activeStage={activeStage} setBậtStage={setBậtStage} />}
-        {screen === 'station' && <StationScreen signals={stationSignals} activeContext={activeContext} setBậtThread={setBậtThread} setScreen={setScreen} setBậtAuth={setBậtAuth} activeMode={activeMode} activeStage={activeStage} setBậtStage={setBậtStage} />}
+        {screen === 'home' && <HomeScreen heroStats={heroStats} setScreen={setScreen} activeMode={activeMode} setActiveMode={setActiveMode} activeContext={activeContext} activeStage={activeStage} setActiveStage={setActiveStage} />}
+        {screen === 'auth' && <AuthScreen activeContext={activeContext} activeAuth={activeAuth} setActiveAuth={setActiveAuth} activeMode={activeMode} auth={auth} setAuth={setAuth} />}
+        {screen === 'chat' && <ChatScreen activeThread={activeThread} setActiveThread={setActiveThread} activeContext={activeContext} setActiveAuth={setActiveAuth} activeMode={activeMode} activeStage={activeStage} setActiveStage={setActiveStage} auth={auth} />}
+        {screen === 'station' && <StationScreen signals={stationSignals} activeContext={activeContext} setActiveThread={setActiveThread} setScreen={setScreen} setActiveAuth={setActiveAuth} activeMode={activeMode} activeStage={activeStage} setActiveStage={setActiveStage} auth={auth} />}
       </main>
     </div>
   )

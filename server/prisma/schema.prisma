@@ -1,0 +1,194 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum WorkspaceRole {
+  OWNER
+  SALES
+  TECHNICAL
+}
+
+enum ThreadStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+model User {
+  id                 String            @id @default(cuid())
+  email              String            @unique
+  passwordHash       String
+  fullName           String
+  status             String            @default("ACTIVE")
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  memberships        WorkspaceMember[]
+  ownedWorkspaces    Workspace[]       @relation("WorkspaceOwner")
+  threads            Thread[]          @relation("ThreadCreator")
+  messages           Message[]
+  files              File[]            @relation("FileUploader")
+  outputs            Output[]          @relation("OutputCreator")
+  assignedOutputs    Output[]          @relation("OutputAssignee")
+  reviewedOutputs    Output[]          @relation("OutputReviewer")
+  releasedOutputs    Output[]          @relation("OutputReleaser")
+  deletedOutputs     Output[]          @relation("OutputDeleter")
+  outputEvents       OutputEvent[]     @relation("OutputEventActor")
+}
+
+model Workspace {
+  id          String            @id @default(cuid())
+  name        String
+  slug        String            @unique
+  status      String            @default("ACTIVE")
+  ownerUserId String
+  owner       User              @relation("WorkspaceOwner", fields: [ownerUserId], references: [id])
+  members     WorkspaceMember[]
+  threads     Thread[]
+  files       File[]
+  documents   Document[]
+  outputs     Output[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model WorkspaceMember {
+  id          String        @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        WorkspaceRole
+  status      String        @default("ACTIVE")
+  joinedAt    DateTime      @default(now())
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
+
+  @@unique([workspaceId, userId])
+}
+
+model Thread {
+  id          String       @id @default(cuid())
+  workspaceId String
+  title       String
+  status      ThreadStatus @default(ACTIVE)
+  createdById String
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id])
+  createdBy   User         @relation("ThreadCreator", fields: [createdById], references: [id])
+  messages    Message[]
+  files       File[]
+  documents   Document[]
+  outputs     Output[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  threadId  String
+  userId    String?
+  role      String
+  content   String
+  createdAt DateTime @default(now())
+  thread    Thread   @relation(fields: [threadId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model File {
+  id           String    @id @default(cuid())
+  workspaceId  String
+  threadId     String?
+  uploadedBy   String
+  originalName String
+  mimeType     String
+  storagePath  String
+  sizeBytes    Int
+  status       String    @default("READY")
+  createdAt    DateTime  @default(now())
+  workspace    Workspace @relation(fields: [workspaceId], references: [id])
+  thread       Thread?   @relation(fields: [threadId], references: [id])
+  uploader     User      @relation("FileUploader", fields: [uploadedBy], references: [id])
+  document     Document?
+}
+
+model Document {
+  id          String    @id @default(cuid())
+  workspaceId String
+  threadId    String?
+  fileId      String    @unique
+  title       String
+  sourceType  String    @default("UPLOAD")
+  status      String    @default("READY")
+  createdAt   DateTime  @default(now())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  thread      Thread?   @relation(fields: [threadId], references: [id])
+  file        File      @relation(fields: [fileId], references: [id])
+  chunks      DocumentChunk[]
+}
+
+model DocumentChunk {
+  id         String   @id @default(cuid())
+  documentId String
+  chunkIndex Int
+  content    String
+  tokenCount Int      @default(0)
+  document   Document @relation(fields: [documentId], references: [id])
+
+  @@unique([documentId, chunkIndex])
+}
+
+model Output {
+  id             String        @id @default(cuid())
+  workspaceId    String
+  threadId       String
+  documentId     String?
+  createdById    String?
+  assignedToId   String?
+  assignedAt     DateTime?
+  reviewedById   String?
+  reviewedAt     DateTime?
+  releasedById   String?
+  releasedAt     DateTime?
+  deletedById    String?
+  deletedAt      DateTime?
+  kind           String
+  title          String
+  content        String
+  status         String        @default("DRAFT")
+  approvalStatus String        @default("PENDING")
+  approvalNote   String?
+  approvedById   String?
+  approvedAt     DateTime?
+  exportStatus   String        @default("NOT_READY")
+  exportChannel  String?
+  exportNote     String?
+  exportedAt     DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  workspace      Workspace     @relation(fields: [workspaceId], references: [id])
+  thread         Thread        @relation(fields: [threadId], references: [id])
+  createdBy      User?         @relation("OutputCreator", fields: [createdById], references: [id])
+  assignedTo     User?         @relation("OutputAssignee", fields: [assignedToId], references: [id])
+  reviewedBy     User?         @relation("OutputReviewer", fields: [reviewedById], references: [id])
+  releasedBy     User?         @relation("OutputReleaser", fields: [releasedById], references: [id])
+  deletedBy      User?         @relation("OutputDeleter", fields: [deletedById], references: [id])
+  events         OutputEvent[]
+
+  @@index([workspaceId, deletedAt])
+}
+
+model OutputEvent {
+  id        String   @id @default(cuid())
+  outputId  String
+  actorId   String?
+  eventType String
+  label     String
+  note      String?
+  payload   Json?
+  createdAt DateTime @default(now())
+  output    Output   @relation(fields: [outputId], references: [id])
+  actor     User?    @relation("OutputEventActor", fields: [actorId], references: [id])
+
+  @@index([outputId, createdAt])
+}

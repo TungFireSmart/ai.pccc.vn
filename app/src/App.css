@@ -989,6 +989,60 @@ button {
   gap: 16px;
 }
 
+.unified-live-grid,
+.embedded-api-grid,
+.retrieval-result-list,
+.triple-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.triple-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.unified-live-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 18px;
+}
+
+.embedded-api-panel {
+  padding: 18px;
+  border-radius: 22px;
+}
+
+.embedded-api-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.retrieval-card {
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(123, 245, 231, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.retrieval-card p,
+.empty-note {
+  margin: 8px 0 0;
+  line-height: 1.7;
+  color: #a9bed4;
+}
+
+.retrieval-card small {
+  display: block;
+  margin-top: 10px;
+  color: #90a8c2;
+}
+
+.message-list.slim {
+  gap: 10px;
+}
+
 .prompt-row {
   display: flex;
   gap: 10px;
@@ -1282,6 +1336,9 @@ button {
   .chat-detail-grid,
   .signal-strip,
   .pilot-track-grid,
+  .unified-live-grid,
+  .embedded-api-grid,
+  .retrieval-result-list,
   .usecase-fit-grid,
   .workflow-snapshot-grid,
   .workflow-board,
@@ -1333,6 +1390,7 @@ button {
 
   .composer-row,
   .double-grid,
+  .triple-grid,
   .hero-preview-stack,
   .stat-grid,
   .board-grid,
@@ -1638,6 +1696,100 @@ button {
   .stage-pill-row,
   .live-flow-grid,
   .transition-rail {
+    grid-template-columns: 1fr;
+  }
+}
+.assistant-brief-strip {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  padding: 18px 20px;
+  border-color: rgba(123, 245, 231, 0.18);
+  background: linear-gradient(135deg, rgba(123, 245, 231, 0.08), rgba(120, 169, 255, 0.08));
+}
+
+.assistant-brief-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.assistant-brief-meta span,
+.side-note {
+  padding: 8px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(123, 245, 231, 0.18);
+  background: rgba(123, 245, 231, 0.08);
+  color: #dffaf5;
+}
+
+.integrated-live-grid .embedded-api-panel {
+  background: linear-gradient(180deg, rgba(13, 23, 36, 0.88), rgba(10, 18, 30, 0.74));
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.integrated-live-grid .embedded-api-head strong {
+  letter-spacing: -0.01em;
+}
+
+.side-note {
+  display: inline-flex;
+  margin-top: 12px;
+}
+
+@media (max-width: 980px) {
+  .assistant-brief-strip {
+    flex-direction: column;
+  }
+
+  .assistant-brief-meta {
+    justify-content: flex-start;
+  }
+}
+.queue-card-button {
+  width: 100%;
+  text-align: left;
+  color: inherit;
+}
+
+.queue-card-button.active {
+  border-color: rgba(123, 245, 231, 0.28);
+  background: linear-gradient(180deg, rgba(123, 245, 231, 0.1), rgba(120, 169, 255, 0.06));
+}
+
+.station-drilldown-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.9fr) minmax(0, 1.1fr);
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.station-queue-column,
+.station-detail-column,
+.output-history-rail {
+  display: grid;
+  gap: 12px;
+}
+
+.queue-drilldown-card,
+.output-history-card {
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03));
+}
+
+.output-history-rail.empty {
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 980px) {
+  .station-drilldown-grid {
     grid-template-columns: 1fr;
   }
 }

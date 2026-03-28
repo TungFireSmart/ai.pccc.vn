@@ -6,7 +6,7 @@ export type FlowStageKey = 'review' | 'approve' | 'export' | 'share'
 export type NavItem = { key: Screen; label: string }
 export type Feature = { title: string; description: string }
 export type Stat = { label: string; value: string; note: string }
-export type Persona = { title: string; summary: string; output: string[] }
+export type Persona = { title: string; summary: string; outputs: string[] }
 export type Message = { role: 'assistant' | 'user'; content: string; meta?: string }
 export type ChatThread = {
   title: string
@@ -43,7 +43,7 @@ export type HandoffStep = { label: string; detail: string; done: boolean }
 export type AuthSession = { device: string; location: string; status: string; lastSeen: string }
 export type AccessRow = { role: string; scope: string; approval: string; seat: string }
 export type PolicyItem = { label: string; detail: string; status: string }
-export type ApprovalStep = { label: string; owner: string; status: 'Done' | 'Bật' | 'Pending'; note: string }
+export type ApprovalStep = { label: string; owner: string; status: 'Done' | 'Active' | 'Pending'; note: string }
 export type ExportArtifact = { name: string; channel: string; state: ExportState; eta: string; note: string }
 export type WorkspaceMode = {
   key: WorkspaceModeKey
@@ -65,7 +65,7 @@ export type TransitionMoment = {
   from: string
   to: string
   eta: string
-  status: 'Bật' | 'Queued' | 'Ready'
+  status: 'Active' | 'Queued' | 'Ready'
   note: string
 }
 
@@ -81,7 +81,7 @@ export type ThreadContextPack = {
   roleWorkspaceState: string
   metrics: MiniMetric[]
   files: FileItem[]
-  output: string[]
+  outputs: string[]
   pulse: InboxItem[]
   activities: ActivityItem[]
   handoffSteps: HandoffStep[]
@@ -184,22 +184,22 @@ export const personas: Persona[] = [
   {
     title: 'Sale PCCC',
     summary: 'Cần phản hồi nhanh và biết còn thiếu dữ liệu gì trước khi tạo lead hay báo giá.',
-    output: ['Draft Zalo / email', 'Checklist hỏi thêm', 'Brief bàn giao cho kỹ thuật'],
+    outputs: ['Draft Zalo / email', 'Checklist hỏi thêm', 'Brief bàn giao cho kỹ thuật'],
   },
   {
     title: 'Kỹ thuật / tư vấn',
     summary: 'Cần bóc yêu cầu từ PDF và trả note xác nhận đúng context.',
-    output: ['Checklist kỹ thuật', 'Tóm tắt hệ thống', 'Note xác nhận thiết bị'],
+    outputs: ['Checklist kỹ thuật', 'Tóm tắt hệ thống', 'Note xác nhận thiết bị'],
   },
   {
     title: 'Hồ sơ thầu',
     summary: 'Cần rà mục dễ thiếu, bám deadline và biết ai đang giữ việc gì.',
-    output: ['Checklist nộp thầu', 'Danh sách rủi ro', 'Email phân việc'],
+    outputs: ['Checklist nộp thầu', 'Danh sách rủi ro', 'Email phân việc'],
   },
   {
     title: 'Owner / Admin',
     summary: 'Cần kiểm soát thành viên, quyền và usage của workspace.',
-    output: ['Role matrix', 'Audit snapshot', 'Usage & access review'],
+    outputs: ['Role matrix', 'Audit snapshot', 'Usage & access review'],
   },
 ]
 
@@ -436,8 +436,8 @@ export const accessMatrix: AccessRow[] = [
 ]
 
 export const policyItems: PolicyItem[] = [
-  { label: 'Domain allowlist', detail: 'Chỉ email @pccc.vn và lời mời hợp lệ mới được vào.', status: 'Bật' },
-  { label: 'Guest project isolation', detail: 'Khách chỉ thấy đúng project được chia sẻ.', status: 'Bật' },
+  { label: 'Domain allowlist', detail: 'Chỉ email @pccc.vn và lời mời hợp lệ mới được vào.', status: 'Active' },
+  { label: 'Guest project isolation', detail: 'Khách chỉ thấy đúng project được chia sẻ.', status: 'Active' },
   { label: 'Cần xem output đỏ', detail: 'Output có cờ đỏ phải được duyệt trước khi gửi ra ngoài.', status: 'Cần duyệt' },
 ]
 
@@ -463,7 +463,7 @@ export const threadContextPacks: ThreadContextPack[] = [
       { name: 'Checklist_noi_bo_biddesk.docx', kind: 'DOCX · SOP', status: 'File tham chiếu' },
       { name: 'Mail_mau_phan_viec.msg', kind: 'Template', status: 'Sẵn để xuất' },
     ],
-    output: [
+    outputs: [
       'Checklist rà HSMT — 18 mục · draft v2',
       'Email nội bộ phân việc — ready to send',
       'Danh sách 3 rủi ro dễ thiếu — flagged',
@@ -488,7 +488,7 @@ export const threadContextPacks: ThreadContextPack[] = [
     ],
     approvalSteps: [
       { label: 'AI draft package', owner: 'Bid Desk', status: 'Done', note: 'Checklist và email phân việc đã ghép xong.' },
-      { label: 'Technical sign-off', owner: 'Technical Desk', status: 'Bật', note: 'Còn xác nhận model và form tiến độ.' },
+      { label: 'Technical sign-off', owner: 'Technical Desk', status: 'Active', note: 'Còn xác nhận model và form tiến độ.' },
       { label: 'Owner release', owner: 'Tùng', status: 'Pending', note: 'Chỉ export sau khi risk flags được duyệt.' },
     ],
     exportArtifacts: [
@@ -509,7 +509,7 @@ export const threadContextPacks: ThreadContextPack[] = [
       { key: 'share', label: 'Handoff xong', owner: 'Bid + Technical', status: 'Queued', detail: 'Khi package xong, thread chuyển sang theo dõi hoàn tất.' },
     ],
     transitionMoments: [
-      { from: 'Bid Desk', to: 'Technical Desk', eta: 'Ngay', status: 'Bật', note: 'Đẩy note hỏi model và form tiến độ cho kỹ thuật duyệt.' },
+      { from: 'Bid Desk', to: 'Technical Desk', eta: 'Ngay', status: 'Active', note: 'Đẩy note hỏi model và form tiến độ cho kỹ thuật duyệt.' },
       { from: 'Technical Desk', to: 'Owner', eta: '15m', status: 'Queued', note: 'Chỉ đưa owner các điểm đỏ đã được kỹ thuật gom gọn.' },
       { from: 'Owner', to: 'Bid Desk', eta: '20m', status: 'Ready', note: 'Sau duyệt, Bid Desk nhận lại package để gửi nội bộ ngay.' },
     ],
@@ -546,7 +546,7 @@ export const threadContextPacks: ThreadContextPack[] = [
       { name: 'Catalog_tu_bom_pccc_2026.pdf', kind: 'PDF · 48 trang', status: 'Customer-safe excerpt ready' },
       { name: 'Lead_capture_checklist.docx', kind: 'DOCX · SOP', status: 'Cần tên/SĐT' },
     ],
-    output: [
+    outputs: [
       'Draft Zalo phản hồi khách — ready to send',
       'Checklist hỏi thêm — thiếu tên + SĐT',
       'Brief bàn giao kỹ thuật — waiting after customer reply',
@@ -568,7 +568,7 @@ export const threadContextPacks: ThreadContextPack[] = [
     ],
     approvalSteps: [
       { label: 'Draft phản hồi', owner: 'Sales Desk', status: 'Done', note: 'Tin nhắn đầu tiên đã theo template an toàn.' },
-      { label: 'Lead data gate', owner: 'Sales Desk', status: 'Bật', note: 'Còn thiếu tên và số điện thoại.' },
+      { label: 'Lead data gate', owner: 'Sales Desk', status: 'Active', note: 'Còn thiếu tên và số điện thoại.' },
       { label: 'Mở handoff kỹ thuật', owner: 'Technical Desk', status: 'Pending', note: 'Chỉ bật khi khách trả lời đủ scope.' },
     ],
     exportArtifacts: [
@@ -588,7 +588,7 @@ export const threadContextPacks: ThreadContextPack[] = [
       { key: 'share', label: 'Handoff kỹ thuật', owner: 'Sales + Technical', status: 'Queued', detail: 'Nếu khách phản hồi đủ scope, brief sẽ sang Technical Desk.' },
     ],
     transitionMoments: [
-      { from: 'Sales Desk', to: 'Customer', eta: '08m', status: 'Bật', note: 'Giữ lead nóng bằng một reply ngắn và lịch sự.' },
+      { from: 'Sales Desk', to: 'Customer', eta: '08m', status: 'Active', note: 'Giữ lead nóng bằng một reply ngắn và lịch sự.' },
       { from: 'Customer', to: 'Sales Desk', eta: 'Phụ thuộc phản hồi', status: 'Queued', note: 'Khi khách trả tên và SĐT, thread tự mở bước tạo brief.' },
       { from: 'Sales Desk', to: 'Technical Desk', eta: 'Sau khi đủ dữ liệu', status: 'Ready', note: 'Bàn giao scope sang kỹ thuật và giữ nguyên lịch sử hỏi đáp.' },
     ],
@@ -625,7 +625,7 @@ export const threadContextPacks: ThreadContextPack[] = [
       { name: 'TCVN_thoat_nan_mixuse.pdf', kind: 'PDF · excerpt', status: 'Cross-check required' },
       { name: 'Legal_summary_mixuse.md', kind: 'Note · 1 page', status: 'Chờ peer review' },
     ],
-    output: [
+    outputs: [
       'Legal summary — 1 trang · ready to export',
       'Danh sách điểm dễ nhầm — internal only',
       'Note kiểm tra chéo — peer review pending',
@@ -647,7 +647,7 @@ export const threadContextPacks: ThreadContextPack[] = [
     ],
     approvalSteps: [
       { label: 'Map nguồn xong', owner: 'Knowledge Desk', status: 'Done', note: 'Nguồn và diễn giải đã được tách sạch.' },
-      { label: 'Peer review', owner: 'Knowledge Desk', status: 'Bật', note: 'Đang chờ một lượt review chéo.' },
+      { label: 'Peer review', owner: 'Knowledge Desk', status: 'Active', note: 'Đang chờ một lượt review chéo.' },
       { label: 'Library release', owner: 'Owner / Admin', status: 'Pending', note: 'Đưa note vào thư viện sau khi review xong.' },
     ],
     exportArtifacts: [
@@ -667,7 +667,7 @@ export const threadContextPacks: ThreadContextPack[] = [
       { key: 'share', label: 'Dùng lại', owner: 'Sales · Technical', status: 'Queued', detail: 'Sau publish, sale và kỹ thuật dùng cùng một note.' },
     ],
     transitionMoments: [
-      { from: 'Knowledge Desk', to: 'Cần xemer', eta: '20m', status: 'Bật', note: 'Cần xemer nhận package rút gọn để kiểm tra nhanh.' },
+      { from: 'Knowledge Desk', to: 'Cần xemer', eta: '20m', status: 'Active', note: 'Cần xemer nhận package rút gọn để kiểm tra nhanh.' },
       { from: 'Cần xemer', to: 'Owner / Admin', eta: 'Sau peer review', status: 'Queued', note: 'Chỉ khi note sạch nguồn mới đi tiếp.' },
       { from: 'Workspace library', to: 'Sales + Technical', eta: 'Ngay sau publish', status: 'Ready', note: 'Cùng một artifact được tái sử dụng cho các desk.' },
     ],
@@ -678,7 +678,7 @@ export const threadContextPacks: ThreadContextPack[] = [
     },
     stationFocus: {
       queueLead: { task: 'Peer review note thoát nạn công trình hỗn hợp', owner: 'Knowledge Desk', eta: '20m', status: 'Cần xem' },
-      policyLead: { label: 'Cần xem trước publish', detail: 'Note pháp lý phải có ít nhất 1 lượt kiểm tra chéo nguồn.', status: 'Bật' },
+      policyLead: { label: 'Cần xem trước publish', detail: 'Note pháp lý phải có ít nhất 1 lượt kiểm tra chéo nguồn.', status: 'Active' },
       rosterNote: 'Knowledge Desk là điểm chính; Sales và Technical là người dùng downstream của output này.',
       adminHeadline: 'Luồng này làm AI Station trông như một knowledge engine có kiểm soát nguồn chứ không chỉ là chat đẹp.',
       reviewLabel: 'Publish focus',
@@ -704,7 +704,7 @@ export const threadContextPacks: ThreadContextPack[] = [
       { name: 'SOP_thu_vien_noi_bo.pdf', kind: 'PDF · internal', status: 'Cần đọc' },
       { name: 'Checklist_tuan_dau.docx', kind: 'DOCX · onboarding', status: 'Sẵn giao' },
     ],
-    output: [
+    outputs: [
       'FAQ onboarding — draft v1',
       'Checklist tuần đầu — ready',
       'Scope access note — admin review pending',
@@ -726,7 +726,7 @@ export const threadContextPacks: ThreadContextPack[] = [
     ],
     approvalSteps: [
       { label: 'Pack onboarding xong', owner: 'Admin Desk', status: 'Done', note: 'FAQ, checklist và reading path đã gom đủ.' },
-      { label: 'Rà scope', owner: 'Owner / Admin', status: 'Bật', note: 'Đang kiểm tra user mới có cần scope rộng hơn không.' },
+      { label: 'Rà scope', owner: 'Owner / Admin', status: 'Active', note: 'Đang kiểm tra user mới có cần scope rộng hơn không.' },
       { label: 'Gửi lời mời', owner: 'Admin Desk', status: 'Pending', note: 'Chỉ gửi lời mời khi quyền đã chốt.' },
     ],
     exportArtifacts: [
@@ -746,7 +746,7 @@ export const threadContextPacks: ThreadContextPack[] = [
       { key: 'share', label: 'Handoff mentor', owner: 'Admin + Technical Mentor', status: 'Queued', detail: 'Checklist tuần đầu đi cùng user mới cho mentor theo dõi.' },
     ],
     transitionMoments: [
-      { from: 'Admin Desk', to: 'Owner / Admin', eta: '12m', status: 'Bật', note: 'Đưa lên đúng câu hỏi về scope cho owner.' },
+      { from: 'Admin Desk', to: 'Owner / Admin', eta: '12m', status: 'Active', note: 'Đưa lên đúng câu hỏi về scope cho owner.' },
       { from: 'Owner / Admin', to: 'User mới', eta: 'Sau khi chốt quyền', status: 'Queued', note: 'Invite gửi kèm access note rõ ràng.' },
       { from: 'User mới', to: 'Technical Mentor', eta: 'Ngày đầu', status: 'Ready', note: 'Mentor tiếp quản checklist tuần đầu và theo dõi tiếp.' },
     ],
@@ -757,7 +757,7 @@ export const threadContextPacks: ThreadContextPack[] = [
     },
     stationFocus: {
       queueLead: { task: 'Rà role guest cho đối tác hồ sơ', owner: 'Admin Desk', eta: 'Hôm nay', status: 'Pending' },
-      policyLead: { label: 'Duyệt nâng quyền', detail: 'Mọi thay đổi từ scope desk chuẩn sang admin đều phải qua duyệt.', status: 'Bật' },
+      policyLead: { label: 'Duyệt nâng quyền', detail: 'Mọi thay đổi từ scope desk chuẩn sang admin đều phải qua duyệt.', status: 'Active' },
       rosterNote: 'Admin Desk đang dẫn kịch bản; Technical Desk là người nhận onboarding sau khi scope được chốt.',
       adminHeadline: 'Thread này nối auth, workspace và station trong một câu chuyện cấp quyền rõ ràng.',
       reviewLabel: 'Onboarding focus',
